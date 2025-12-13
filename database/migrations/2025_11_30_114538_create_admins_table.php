@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void {
         Schema::create('admins', function (Blueprint $table) {
-            $table->bigInteger('admin_id')->primary();
+            $table->unsignedBigInteger('admin_id')->primary();
             $table->string('name', 255);
             $table->string('email', 255)->unique();
             $table->string('password', 255);

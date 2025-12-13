@@ -7,7 +7,7 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('reservation_combos', function (Blueprint $table) {
             $table->char('booking_code', 12);
-            $table->tinyInteger('combo_id');
+            $table->unsignedTinyInteger('combo_id');
             $table->tinyInteger('quantity')->default(1);
             $table->integer('combo_price')->unsigned();
             

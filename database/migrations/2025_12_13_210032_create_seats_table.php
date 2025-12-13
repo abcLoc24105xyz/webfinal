@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void {
         Schema::create('seats', function (Blueprint $table) {
-            $table->integer('seat_id')->primary();
+            $table->unsignedInteger('seat_id')->primary();
             $table->char('room_code', 6);
             $table->char('seat_num', 4)->comment('ví dụ A1, E10');
             $table->tinyInteger('seat_type')->comment('1=Regular,2=VIP,3=Couple');

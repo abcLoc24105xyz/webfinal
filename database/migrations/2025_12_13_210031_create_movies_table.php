@@ -6,10 +6,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void {
         Schema::create('movies', function (Blueprint $table) {
-            $table->smallInteger('movie_id')->primary();
+            $table->unsignedSmallInteger('movie_id')->primary();
             $table->string('title', 255);
             $table->string('slug', 200)->unique();
-            $table->tinyInteger('cate_id')->nullable();
+            $table->unsignedTinyInteger('cate_id')->nullable();
             $table->string('director', 150)->nullable();
             $table->smallInteger('duration')->comment('phút');
             $table->text('description')->nullable();

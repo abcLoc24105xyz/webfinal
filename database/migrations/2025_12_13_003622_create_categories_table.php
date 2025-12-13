@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void {
         Schema::create('categories', function (Blueprint $table) {
-            $table->tinyInteger('cate_id')->primary();
+            $table->unsignedTinyInteger('cate_id')->primary();
             $table->string('name', 50)->unique();
         });
     }

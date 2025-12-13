@@ -28,12 +28,18 @@ RUN apk add --no-cache \
     nginx \
     nodejs \
     npm \
-    # Build deps tạm thời (sẽ gỡ sau)
+    libpng \
+    libjpeg-turbo \
+    freetype \
+    libwebp \
     && apk add --no-cache --virtual .build-deps \
         oniguruma-dev \
-    # Install PHP extensions
-    && docker-php-ext-install pdo pdo_mysql mbstring \
-    # Gỡ build deps để giữ image nhỏ
+        libpng-dev \
+        libjpeg-turbo-dev \
+        freetype-dev \
+        libwebp-dev \
+    && docker-php-ext-configure gd --with-jpeg --with-freetype --with-webp \
+    && docker-php-ext-install pdo pdo_mysql mbstring gd \
     && apk del .build-deps
 
 # Copy vendor từ builder

@@ -7,8 +7,8 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('shows', function (Blueprint $table) {
             $table->binary('show_id', 16)->primary();
-            $table->smallInteger('movie_id')->nullable();
-            $table->smallInteger('cinema_id');
+            $table->unsignedSmallInteger('movie_id')->nullable();
+            $table->unsignedSmallInteger('cinema_id');
             $table->char('room_code', 6);
             $table->date('show_date');
             $table->time('start_time');

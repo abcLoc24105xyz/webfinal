@@ -8,7 +8,7 @@ return new class extends Migration {
         Schema::create('reservations', function (Blueprint $table) {
             $table->char('booking_code', 50)->primary();
             $table->char('ticket_code', 20)->nullable()->unique();
-            $table->integer('user_id');
+            $table->unsignedInteger('user_id');
             $table->binary('show_id', 16);
             $table->integer('total_amount')->unsigned()->comment('VNĐ');
             $table->string('status', 20)->default('pending');

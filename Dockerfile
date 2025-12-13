@@ -1,49 +1,49 @@
-# Build stage
+# Build stage - chỉ để cài Composer dependencies
 FROM php:8.2-fpm-alpine AS builder
 
 WORKDIR /app
 
+# Cài các tools cần thiết cho Composer
 RUN apk add --no-cache \
-    curl \
     git \
-    zip \
-    unzip \
-    oniguruma-dev
-
-RUN docker-php-ext-install pdo pdo_mysql mbstring
-
-# Cài dependency cho mbstring ở runtime
-RUN apk add --no-cache oniguruma-dev
+    unzip
 
 # Cài đặt Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+# Copy composer files và cài dependencies
 COPY composer.* ./
-RUN composer install --no-scripts --no-autoloader --no-interaction --prefer-dist
+RUN composer install --no-scripts --no-autoloader --no-interaction --prefer-dist --no-dev
 
 # Runtime stage
 FROM php:8.2-fpm-alpine
 
 WORKDIR /app
 
+# Cài runtime dependencies + build dependencies tạm thời cho php extensions
 RUN apk add --no-cache \
     curl \
     libpq \
     oniguruma \
     nginx \
     nodejs \
-    npm
+    npm \
+    # Build deps tạm thời (sẽ gỡ sau)
+    && apk add --no-cache --virtual .build-deps \
+        oniguruma-dev \
+    # Install PHP extensions
+    && docker-php-ext-install pdo pdo_mysql mbstring \
+    # Gỡ build deps để giữ image nhỏ
+    && apk del .build-deps
 
-RUN docker-php-ext-install pdo pdo_mysql mbstring
-
-# Copy từ builder
+# Copy vendor từ builder
 COPY --from=builder /app/vendor ./vendor
 COPY --from=builder /usr/local/bin/composer /usr/local/bin/composer
 
 # Copy source code
 COPY . .
 
-# Cài đặt npm dependencies
+# Cài npm dependencies (chỉ production)
 COPY package*.json ./
 RUN npm install --production
 
@@ -52,16 +52,20 @@ RUN mkdir -p /etc/nginx/conf.d
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 
 # Tạo storage directories
-RUN mkdir -p storage/logs storage/framework/sessions storage/framework/views storage/framework/cache
+RUN mkdir -p \
+    storage/logs \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/framework/cache
 
 # Set permissions
 RUN chown -R www-data:www-data /app
 
-# Composer autoload
-RUN composer dump-autoload --optimize
+# Composer optimize autoload (cho production)
+RUN composer dump-autoload --optimize --no-dev
 
-# Expose port (Render sẽ gán PORT từ env)
+# Expose port (Render hoặc các platform khác sẽ inject PORT)
 EXPOSE 80
 
-# Start services
+# Start php-fpm và nginx
 CMD ["/bin/sh", "-c", "php-fpm & nginx -g 'daemon off;'"]

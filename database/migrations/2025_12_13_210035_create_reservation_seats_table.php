@@ -7,7 +7,7 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('reservation_seats', function (Blueprint $table) {
             $table->char('booking_code', 12);
-            $table->integer('seat_id');
+            $table->unsignedInteger('seat_id');
             $table->integer('seat_price')->unsigned();
             
             $table->primary(['booking_code', 'seat_id']);

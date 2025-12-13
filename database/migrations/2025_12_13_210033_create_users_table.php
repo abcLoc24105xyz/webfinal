@@ -22,7 +22,7 @@ return new class extends Migration {
             $table->text('provider_avatar')->nullable();
             $table->tinyInteger('status')->default(1);
             $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->useCurrentOnUpdate();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
         });
     }
 

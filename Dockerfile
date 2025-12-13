@@ -1,24 +1,97 @@
-FROM richarvey/nginx-php-fpm:3.1.6
+# Build stage - cài Composer dependencies với các extension cần thiết
+FROM php:8.2-fpm-alpine AS builder
 
+WORKDIR /app
+
+# Cài runtime libs + build deps tạm thời để có ext-gd và ext-zip khi chạy Composer
+RUN apk add --no-cache \
+    libpng \
+    libjpeg-turbo \
+    freetype \
+    libwebp \
+    zlib \
+    libzip \
+    && apk add --no-cache --virtual .build-deps \
+        git \
+        unzip \
+        oniguruma-dev \
+        libpng-dev \
+        libjpeg-turbo-dev \
+        freetype-dev \
+        libwebp-dev \
+        zlib-dev \
+        libzip-dev \
+    && docker-php-ext-configure gd --with-jpeg --with-freetype --with-webp \
+    && docker-php-ext-install gd zip \
+    && apk del .build-deps
+
+# Cài đặt Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Copy composer files và cài dependencies (production)
+COPY composer.* ./
+RUN composer install --no-scripts --no-autoloader --no-interaction --prefer-dist --no-dev
+
+# Runtime stage
+FROM php:8.2-fpm-alpine
+
+WORKDIR /app
+
+# Cài runtime dependencies + build deps tạm thời cho các PHP extensions cần thiết
+RUN apk add --no-cache \
+    curl \
+    libpq \
+    oniguruma \
+    nginx \
+    nodejs \
+    npm \
+    libpng \
+    libjpeg-turbo \
+    freetype \
+    libwebp \
+    zlib \
+    libzip \
+    && apk add --no-cache --virtual .build-deps \
+        oniguruma-dev \
+        libpng-dev \
+        libjpeg-turbo-dev \
+        freetype-dev \
+        libwebp-dev \
+        libzip-dev \
+    && docker-php-ext-configure gd --with-jpeg --with-freetype --with-webp \
+    && docker-php-ext-install pdo pdo_mysql mbstring gd zip \
+    && apk del .build-deps
+
+# Copy vendor và composer từ builder
+COPY --from=builder /app/vendor ./vendor
+COPY --from=builder /usr/local/bin/composer /usr/local/bin/composer
+
+# Copy source code
 COPY . .
 
-RUN apk add --no-cache postgresql-dev && \
-    docker-php-ext-install pdo_pgsql
+# Cài npm dependencies (production only)
+COPY package*.json ./
+RUN npm install --production
 
-ENV APP_ENV=production
-ENV APP_DEBUG=false
-ENV LOG_CHANNEL=stderr
-ENV WEBROOT=/var/www/html/public
-ENV COMPOSER_ALLOW_SUPERUSER=1
+# Copy nginx config
+RUN mkdir -p /etc/nginx/conf.d
+COPY docker/nginx.conf /etc/nginx/nginx.conf
 
-RUN composer install --no-dev --optimize-autoloader
+# Tạo storage directories
+RUN mkdir -p \
+    storage/logs \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/framework/cache
 
-RUN php artisan key:generate
+# Set permissions
+RUN chown -R www-data:www-data /app
 
-RUN php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache
+# Composer optimize autoload (production)
+RUN composer dump-autoload --optimize --no-dev
 
-RUN chmod -R 775 storage bootstrap/cache
+# Expose port
+EXPOSE 80
 
+# Start php-fpm và nginx
 CMD ["sh", "-c", "php artisan migrate:fresh --seed && /start.sh"]

@@ -11,8 +11,8 @@ return new class extends Migration {
             $table->integer('seat_price')->unsigned();
             
             $table->primary(['booking_code', 'seat_id']);
-            $table->foreign('booking_code')->references('booking_code')->on('reservations')->onDelete('cascade');
-            $table->foreign('seat_id')->references('seat_id')->on('seats')->onDelete('cascade');
+            $table->foreign('booking_code')->references('booking_code')->on('reservations')->onDelete('cascade')->onUpdate('cascade'); 
+            $table->foreign('seat_id')->references('seat_id')->on('seats')->onDelete('cascade')->onUpdate('cascade');  
         });
     }
 

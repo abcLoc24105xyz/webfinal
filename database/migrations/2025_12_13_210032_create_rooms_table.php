@@ -22,11 +22,7 @@ return new class extends Migration {
             $table->unique(['cinema_id', 'room_code'], 'uq_room_cinema');
 
             // Foreign key với kiểu dữ liệu chắc chắn khớp (unsigned smallint)
-            $table->foreign('cinema_id')
-                  ->references('cinema_id')
-                  ->on('cinemas')
-                  ->onDelete('cascade')
-                  ->onUpdate('cascade');
+            $table->foreign('cinema_id')->references('cinema_id')->on('cinemas')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

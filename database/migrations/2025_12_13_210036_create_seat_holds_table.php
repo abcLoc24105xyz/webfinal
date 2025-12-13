@@ -16,8 +16,8 @@ return new class extends Migration {
             $table->unique(['show_id', 'seat_id'], 'uq_hold');
             $table->index('expires_at', 'seat_holds_expires_at_index');
             
-            $table->foreign('show_id')->references('show_id')->on('shows')->onDelete('cascade');
-            $table->foreign('seat_id')->references('seat_id')->on('seats')->onDelete('cascade');
+            $table->foreign('show_id')->references('show_id')->on('shows')->onDelete('cascade')->onUpdate('cascade');  
+            $table->foreign('seat_id')->references('seat_id')->on('seats')->onDelete('cascade')->onUpdate('cascade');  
         });
     }
 

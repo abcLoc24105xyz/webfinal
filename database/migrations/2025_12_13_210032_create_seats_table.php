@@ -13,7 +13,7 @@ return new class extends Migration {
             $table->integer('default_price')->unsigned()->comment('VNĐ');
             
             $table->unique(['room_code', 'seat_num'], 'uq_seat_room');
-            $table->foreign('room_code')->references('room_code')->on('rooms')->onDelete('cascade');
+            $table->foreign('room_code')->references('room_code')->on('rooms')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

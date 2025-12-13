@@ -31,7 +31,7 @@ RUN apk add --no-cache \
     nodejs \
     npm
 
-RUN docker-php-ext-install pdo pdo_pgsql pdo_mysql mbstring
+RUN docker-php-ext-install pdo pdo_mysql mbstring
 
 # Copy từ builder
 COPY --from=builder /app/vendor ./vendor

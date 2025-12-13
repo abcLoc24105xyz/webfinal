@@ -1,17 +1,34 @@
-# Build stage - chỉ để cài Composer dependencies
+# Build stage - cài Composer dependencies với các extension cần thiết
 FROM php:8.2-fpm-alpine AS builder
 
 WORKDIR /app
 
-# Cài các tools cần thiết cho Composer
+# Cài runtime libs + build deps tạm thời để có ext-gd và ext-zip khi chạy Composer
 RUN apk add --no-cache \
-    git \
-    unzip
+    libpng \
+    libjpeg-turbo \
+    freetype \
+    libwebp \
+    zlib \
+    libzip \
+    && apk add --no-cache --virtual .build-deps \
+        git \
+        unzip \
+        oniguruma-dev \
+        libpng-dev \
+        libjpeg-turbo-dev \
+        freetype-dev \
+        libwebp-dev \
+        zlib-dev \
+        libzip-dev \
+    && docker-php-ext-configure gd --with-jpeg --with-freetype --with-webp \
+    && docker-php-ext-install gd zip \
+    && apk del .build-deps
 
 # Cài đặt Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Copy composer files và cài dependencies
+# Copy composer files và cài dependencies (production)
 COPY composer.* ./
 RUN composer install --no-scripts --no-autoloader --no-interaction --prefer-dist --no-dev
 
@@ -20,7 +37,7 @@ FROM php:8.2-fpm-alpine
 
 WORKDIR /app
 
-# Cài runtime dependencies + build dependencies tạm thời cho php extensions
+# Cài runtime dependencies + build deps tạm thời cho các PHP extensions cần thiết
 RUN apk add --no-cache \
     curl \
     libpq \
@@ -32,24 +49,27 @@ RUN apk add --no-cache \
     libjpeg-turbo \
     freetype \
     libwebp \
+    zlib \
+    libzip \
     && apk add --no-cache --virtual .build-deps \
         oniguruma-dev \
         libpng-dev \
         libjpeg-turbo-dev \
         freetype-dev \
         libwebp-dev \
+        libzip-dev \
     && docker-php-ext-configure gd --with-jpeg --with-freetype --with-webp \
-    && docker-php-ext-install pdo pdo_mysql mbstring gd \
+    && docker-php-ext-install pdo pdo_mysql mbstring gd zip \
     && apk del .build-deps
 
-# Copy vendor từ builder
+# Copy vendor và composer từ builder
 COPY --from=builder /app/vendor ./vendor
 COPY --from=builder /usr/local/bin/composer /usr/local/bin/composer
 
 # Copy source code
 COPY . .
 
-# Cài npm dependencies (chỉ production)
+# Cài npm dependencies (production only)
 COPY package*.json ./
 RUN npm install --production
 
@@ -67,10 +87,10 @@ RUN mkdir -p \
 # Set permissions
 RUN chown -R www-data:www-data /app
 
-# Composer optimize autoload (cho production)
+# Composer optimize autoload (production)
 RUN composer dump-autoload --optimize --no-dev
 
-# Expose port (Render hoặc các platform khác sẽ inject PORT)
+# Expose port
 EXPOSE 80
 
 # Start php-fpm và nginx

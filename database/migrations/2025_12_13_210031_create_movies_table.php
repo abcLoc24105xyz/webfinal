@@ -25,7 +25,7 @@ return new class extends Migration {
             $table->index('title', 'idx_title');
             $table->index('release_date', 'idx_release');
             $table->index('status', 'idx_status');
-            $table->foreign('cate_id')->references('cate_id')->on('categories')->onDelete('setNull');
+            $table->foreign('cate_id')->references('cate_id')->on('categories')->onDelete('set null');
         });
     }
 

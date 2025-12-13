@@ -77,15 +77,16 @@ RUN npm install --production
 RUN mkdir -p /etc/nginx/conf.d
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 
-# Tạo storage directories
 RUN mkdir -p \
     storage/logs \
     storage/framework/sessions \
     storage/framework/views \
-    storage/framework/cache
+    storage/framework/cache \
+    bootstrap/cache
 
-# Set permissions
-RUN chown -R www-data:www-data /app
+# Set permissions - TRƯỚC composer dump-autoload
+RUN chmod -R 777 storage bootstrap/cache && \
+    chown -R www-data:www-data /app
 
 # Composer optimize autoload (production)
 RUN composer dump-autoload --optimize --no-dev

@@ -8,10 +8,9 @@ RUN apk add --no-cache \
     git \
     zip \
     unzip \
-    libpq-dev \
     oniguruma-dev
 
-RUN docker-php-ext-install pdo pdo_pgsql pdo_mysql mbstring
+RUN docker-php-ext-install pdo pdo_mysql mbstring
 
 # Cài đặt Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

@@ -59,7 +59,7 @@ RUN apk add --no-cache \
         libwebp-dev \
         libzip-dev \
     && docker-php-ext-configure gd --with-jpeg --with-freetype --with-webp \
-    && docker-php-ext-install pdo pdo_pgsql mbstring gd zip \
+    && docker-php-ext-install pdo pdo_mysql mbstring gd zip \
     
     && apk del .build-deps
 

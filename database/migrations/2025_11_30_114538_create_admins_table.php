@@ -1,34 +1,25 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
+return new class extends Migration {
+    public function up(): void {
         Schema::create('admins', function (Blueprint $table) {
-            $table->id('admin_id');
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->string('phone')->nullable();
-            $table->boolean('is_super')->default(false); // để phân quyền super admin nếu cần
-            $table->boolean('status')->default(true);
-            $table->rememberToken();
-            $table->timestamps(); // admin nên có timestamps
+            $table->bigInteger('admin_id')->primary();
+            $table->string('name', 255);
+            $table->string('email', 255)->unique();
+            $table->string('password', 255);
+            $table->string('phone', 255)->nullable();
+            $table->tinyInteger('is_super')->default(0);
+            $table->tinyInteger('status')->default(1);
+            $table->string('remember_token', 100)->nullable();
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
+    public function down(): void {
         Schema::dropIfExists('admins');
     }
 };

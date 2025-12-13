@@ -77,17 +77,18 @@ RUN npm install --production
 RUN mkdir -p /etc/nginx/conf.d
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 
-# Tạo storage directories
+# Tạo các thư mục cần thiết cho Laravel (bao gồm bootstrap/cache)
 RUN mkdir -p \
     storage/logs \
     storage/framework/sessions \
     storage/framework/views \
-    storage/framework/cache
+    storage/framework/cache \
+    bootstrap/cache
 
-# Set permissions
+# Set permissions cho toàn bộ /app (bao gồm bootstrap/cache)
 RUN chown -R www-data:www-data /app
 
-# Composer optimize autoload (production)
+# Composer optimize autoload (production) - chạy sau khi đã có quyền ghi
 RUN composer dump-autoload --optimize --no-dev
 
 # Expose port

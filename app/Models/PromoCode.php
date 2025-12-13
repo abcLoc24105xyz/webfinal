@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 
-class Promocode extends Model
+class PromoCode extends Model
 {
     protected $table = 'promocode';
     protected $primaryKey = 'promo_code';

@@ -87,7 +87,6 @@ RUN echo '#!/bin/sh' > /start.sh \
 
 # Copy nginx config ưu tiên (nếu có file docker/nginx.conf thì dùng, nếu không thì tạo default config cho Laravel)
 RUN mkdir -p /etc/nginx/conf.d
-COPY docker/nginx.conf /etc/nginx/nginx.conf 2>/dev/null || true
 
 RUN cat << 'EOF' > /etc/nginx/conf.d/default.conf
 server {

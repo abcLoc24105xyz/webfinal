@@ -70,7 +70,7 @@
                     <div>
                         <label class="block text-sm font-bold text-white mb-2">Danh mục <span class="text-red-400">*</span></label>
                         <select name="cate_id" required class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/30 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition pr-10"
-                                style="background-image: url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27%23a78bfa%27 viewBox=%270 0 24 24%27%3e%3cpath d=%27M7 10l5 5 5-5z%27/%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.2em;">
+                                style="background-image: url('data:image/svg+xml,%3csvg xmlns=%27https://www.w3.org/2000/svg%27 fill=%27%23a78bfa%27 viewBox=%270 0 24 24%27%3e%3cpath d=%27M7 10l5 5 5-5z%27/%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.2em;">
                             <option value="">-- Chọn danh mục --</option>
                             @foreach($categories as $cat)
                                 <option value="{{ $cat->cate_id }}" {{ old('cate_id', $movie->cate_id) == $cat->cate_id ? 'selected' : '' }}>
@@ -132,7 +132,7 @@
                     <div>
                         <label class="block text-sm font-bold text-white mb-2">Giới hạn tuổi <span class="text-red-400">*</span></label>
                         <select name="age_limit" required class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/30 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition pr-10"
-                                style="background-image: url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 fill=%27%23a78bfa%27 viewBox=%270 0 24 24%27%3e%3cpath d=%27M7 10l5 5 5-5z%27/%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.2em;">
+                                style="background-image: url('data:image/svg+xml,%3csvg xmlns=%27https://www.w3.org/2000/svg%27 fill=%27%23a78bfa%27 viewBox=%270 0 24 24%27%3e%3cpath d=%27M7 10l5 5 5-5z%27/%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.2em;">
                             <option value="">-- Chọn giới hạn tuổi --</option>
                             <option value="0" {{ old('age_limit', $movie->age_limit) == 0 ? 'selected' : '' }}>P - Phổ thông (mọi lứa tuổi)</option>
                             <option value="13" {{ old('age_limit', $movie->age_limit) == 13 ? 'selected' : '' }}>T13 - Cấm trẻ em dưới 13 tuổi</option>

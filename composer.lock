@@ -259,7 +259,7 @@
                 {
                     "name": "Jordi Boggiano",
                     "email": "j.boggiano@seld.be",
-                    "homepage": "http://seld.be"
+                    "homepage": "https://seld.be"
                 }
             ],
             "description": "PCRE wrapping library that offers type-safe preg_* replacements.",
@@ -332,12 +332,12 @@
                 {
                     "name": "Dragonfly Development Inc.",
                     "email": "info@dflydev.com",
-                    "homepage": "http://dflydev.com"
+                    "homepage": "https://dflydev.com"
                 },
                 {
                     "name": "Beau Simensen",
                     "email": "beau@dflydev.com",
-                    "homepage": "http://beausimensen.com"
+                    "homepage": "https://beausimensen.com"
                 },
                 {
                     "name": "Carlos Frutos",
@@ -2174,7 +2174,7 @@
                 {
                     "name": "Ben Corlett",
                     "email": "bencorlett@me.com",
-                    "homepage": "http://www.webcomm.com.au",
+                    "homepage": "https://www.webcomm.com.au",
                     "role": "Developer"
                 }
             ],
@@ -3283,21 +3283,21 @@
             "authors": [
                 {
                     "name": "Maarten Balliauw",
-                    "homepage": "http://blog.maartenballiauw.be"
+                    "homepage": "https://blog.maartenballiauw.be"
                 },
                 {
                     "name": "Mark Baker"
                 },
                 {
                     "name": "Franck Lefevre",
-                    "homepage": "http://blog.rootslabs.net"
+                    "homepage": "https://blog.rootslabs.net"
                 },
                 {
                     "name": "Erik Tilt"
                 }
             ],
             "description": "PHPExcel - OpenXML - Read, Create and Write Spreadsheet documents in PHP - Spreadsheet engine",
-            "homepage": "http://phpexcel.codeplex.com",
+            "homepage": "https://phpexcel.codeplex.com",
             "keywords": [
                 "OpenXML",
                 "excel",
@@ -3564,7 +3564,7 @@
                 }
             ],
             "description": "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc.",
-            "homepage": "http://phpseclib.sourceforge.net",
+            "homepage": "https://phpseclib.sourceforge.net",
             "keywords": [
                 "BigInteger",
                 "aes",
@@ -3740,7 +3740,7 @@
             "authors": [
                 {
                     "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
+                    "homepage": "https://www.php-fig.org/"
                 }
             ],
             "description": "Standard interfaces for event handling.",

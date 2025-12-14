@@ -36,7 +36,7 @@
     .modern-select {
         appearance: none;
         padding-right: 24px;
-        background-image: url("data:image/svg+xml,%3Csvg fill='%23d946ef' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'%3E</path></svg>");
+        background-image: url("data:image/svg+xml,%3Csvg fill='%23d946ef' viewBox='0 0 24 24' xmlns='https://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'%3E</path></svg>");
         background-position: right 0.5rem center;
         background-repeat: no-repeat;
     }

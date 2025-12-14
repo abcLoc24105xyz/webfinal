@@ -69,7 +69,7 @@ class RegisterController extends Controller
                     ]);
 
                     try {
-                        Mail::to($request->email)->send(new OtpMail($otp, $request->full_name, 'register'));
+                        //Mail::to($request->email)->send(new OtpMail($otp, $request->full_name, 'register'));
                         
                         session()->put('email', $request->email);
                         

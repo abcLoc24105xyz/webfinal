@@ -94,13 +94,14 @@ RUN echo '#!/bin/sh' > /start.sh \
     && echo 'nginx -g "daemon off;"' >> /start.sh \
     && chmod +x /start.sh
 
-# Tạo thư mục nginx config
+# Tạo thư mục config cho nginx
 RUN mkdir -p /etc/nginx/http.d
 
-# Copy nginx.conf nếu tồn tại, nếu không thì dùng default
-COPY docker/nginx.conf /etc/nginx/nginx.conf || true
+# Copy file nginx.conf từ thư mục docker/ (nếu có) - đây là file bạn đã tạo
+COPY docker/nginx.conf /etc/nginx/nginx.conf
 
-# Tạo default config cho Laravel (đặt trong http.d để dễ include nếu có nginx.conf riêng)
+# Tạo default server block để chắc chắn có config hoạt động
+# Nếu bạn đã có full nginx.conf với include http.d/*.conf thì nó sẽ tự load thêm
 RUN cat << 'EOF' > /etc/nginx/http.d/default.conf
 server {
     listen 80 default_server;

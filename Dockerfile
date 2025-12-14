@@ -67,7 +67,7 @@ COPY . .
 # Cài npm dependencies (production only)
 RUN npm ci --only=production
 
-# Tạo các thư mục cần thiết cho Laravel (sửa lỗi typo "vieaws" → "views")
+# Tạo các thư mục cần thiết cho Laravel
 RUN mkdir -p \
         storage/logs \
         storage/framework/sessions \
@@ -85,15 +85,17 @@ RUN echo '#!/bin/sh' > /start.sh \
     && echo 'nginx -g "daemon off;"' >> /start.sh \
     && chmod +x /start.sh
 
-# Copy nginx config ưu tiên (nếu có file docker/nginx.conf thì dùng, nếu không thì tạo default config cho Laravel)
-RUN mkdir -p /etc/nginx/conf.d
+# Tạo thư mục nginx config
+RUN mkdir -p /etc/nginx/http.d
 
-COPY docker/nginx.conf /etc/nginx/nginx.conf 2>/dev/null || true
+# Copy nginx.conf nếu tồn tại trong thư mục docker/, nếu không thì bỏ qua và dùng default
+COPY docker/nginx.conf /etc/nginx/nginx.conf || true
 
-RUN cat << 'EOF' > /etc/nginx/conf.d/default.conf
+# Tạo default config cho Laravel (luôn có, nếu có nginx.conf riêng thì nó sẽ include http.d/*.conf)
+RUN cat << 'EOF' > /etc/nginx/http.d/default.conf
 server {
-    listen 80;
-    server_name localhost;
+    listen 80 default_server;
+    server_name _;
 
     root /app/public;
     index index.php index.html index.htm;
@@ -115,7 +117,7 @@ server {
 }
 EOF
 
-# Optimize Composer autoload cho production (chỉ dump-autoload, không install lại)
+# Optimize Composer autoload cho production
 RUN composer dump-autoload --optimize --no-dev
 
 # Expose port

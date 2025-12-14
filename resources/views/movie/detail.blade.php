@@ -216,55 +216,54 @@
     {{-- Danh sách suất chiếu --}}
     <div class="py-16 bg-gradient-to-br from-slate-800 to-black px-4">
         <div class="max-w-6xl mx-auto">
-            <h2 class="text-4xl font-heading font-black text-center text-white mb-10">
+            <h2 class="text-4xl font-heading font-black text-center text-white mb-12">
                 {{ $selectedCinemaId ? 'Suất chiếu - ' . ($availableCinemas->firstWhere('cinema_id', $selectedCinemaId)->cinema_name ?? '') : 'Suất chiếu tất cả rạp' }}
             </h2>
 
-            <div class="space-y-8">
-                @forelse($shows as $cinemaId => $showGroup)
-                    @php $cinema = $showGroup->first()->cinema @endphp
-                    <div class="group bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-500">
-                        <div class="bg-gradient-to-r from-purple-600 to-pink-600 p-5 md:p-6">
-                            <h3 class="text-2xl font-heading font-extrabold text-white">{{ $cinema->cinema_name }}</h3>
-                            <p class="mt-1 text-purple-100 text-sm opacity-90">{{ $cinema->address }}</p>
-                        </div>
-                        <div class="p-6 md:p-8">
-                            <div class="flex flex-wrap gap-4 justify-center lg:justify-start">
-                                @foreach($showGroup as $show)
-                                    @php $startTime = \Carbon\Carbon::parse($show->start_time); @endphp
+            @forelse($shows as $cinemaId => $showGroup)
+                @php $cinema = $showGroup->first()->cinema @endphp
+                <div class="mb-12">
+                    <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-t-3xl p-6 md:p-8">
+                        <h3 class="text-2xl md:text-3xl font-heading font-extrabold text-white">{{ $cinema->cinema_name }}</h3>
+                        <p class="mt-2 text-purple-100 text-sm opacity-90">{{ $cinema->address }}</p>
+                    </div>
+                    <div class="bg-slate-700/50 backdrop-blur-sm rounded-b-3xl p-8">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                            @foreach($showGroup as $show)
+                                @php $startTime = \Carbon\Carbon::parse($show->start_time); @endphp
 
-                                    @auth
-                                        <a href="{{ route('seat.selection', $show->show_id) }}"
-                                           class="group/show relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 p-4 text-white text-center shadow-lg w-[140px] md:w-[150px] transform transition-all duration-300 hover:scale-[1.05] hover:shadow-purple-500/40">
-                                            <div class="text-3xl font-black tracking-tight">{{ $startTime->format('H:i') }}</div>
-                                            <div class="mt-2 space-y-1">
-                                                <p class="text-sm font-semibold opacity-90 truncate">{{ $show->room->room_name ?? 'Phòng thường' }}</p>
-                                                <p class="text-xs bg-white/20 px-3 py-1 rounded-full inline-block font-medium">Còn <strong>{{ $show->remaining_seats }}</strong> ghế</p>
-                                            </div>
-                                        </a>
-                                    @else
-                                        <button type="button"
-                                                onclick="window.location.href = {{ route('seat.selection', $show->show_id) }}"
-                                                class="group/show relative overflow-hidden rounded-xl bg-gray-50 border-2 border-dashed border-gray-300 p-4 text-center text-gray-500 font-bold text-lg w-[140px] md:w-[150px] h-[148px] hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 flex flex-col justify-center items-center cursor-pointer">
-                                            <svg class="w-12 h-12 mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                            </svg>
-                                            <span class="text-sm">Đăng nhập để đặt vé</span>
-                                        </button>
-                                    @endauth
-                                @endforeach
-                            </div>
+                                @auth
+                                    <a href="{{ route('seat.selection', $show->show_id) }}"
+                                    class="group/show relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 p-4 text-white text-center shadow-lg transform transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-purple-500/60">
+                                        <div class="text-3xl md:text-4xl font-black tracking-tight">{{ $startTime->format('H:i') }}</div>
+                                        <div class="mt-3 space-y-2">
+                                            <p class="text-xs md:text-sm font-bold opacity-95 truncate">{{ $show->room->room_name ?? 'Phòng' }}</p>
+                                            <p class="text-xs bg-white/25 px-3 py-1.5 rounded-full inline-block font-semibold">{{ $show->remaining_seats }} ghế</p>
+                                        </div>
+                                        <div class="absolute inset-0 bg-white opacity-0 group-hover/show:opacity-10 transition-opacity duration-500 pointer-events-none rounded-2xl"></div>
+                                    </a>
+                                @else
+                                    <a href="{{ route('login') }}?redirect={{ url()->current() }}"
+                                    class="relative overflow-hidden rounded-2xl bg-gray-50 border-3 border-dashed border-gray-300 p-4 text-center text-gray-600 font-bold hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 flex flex-col justify-center items-center min-h-[140px]">
+                                        <div class="text-3xl md:text-4xl font-black">{{ $startTime->format('H:i') }}</div>
+                                        <div class="mt-3 text-xs md:text-sm">Đăng nhập</div>
+                                    </a>
+                                @endauth
+                            @endforeach
                         </div>
                     </div>
-                @empty
-                    <div class="text-center py-20">
-                        <div class="inline-block bg-white/10 backdrop-blur-xl rounded-2xl px-12 py-10 border border-white/20">
-                            <p class="text-4xl font-black text-gray-400">Không có suất chiếu nào</p>
-                            <p class="text-xl text-gray-500 mt-4">Hãy chọn ngày hoặc rạp khác!</p>
-                        </div>
+                </div>
+            @empty
+                <div class="text-center py-24">
+                    <div class="inline-block bg-white/10 backdrop-blur-xl rounded-3xl px-16 py-16 border border-white/20">
+                        <svg class="w-20 h-20 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                        </svg>
+                        <p class="text-3xl md:text-4xl font-heading font-extrabold text-gray-300">Không có suất chiếu</p>
+                        <p class="text-gray-400 mt-3 text-lg">Chọn ngày hoặc rạp khác</p>
                     </div>
-                @endforelse
-            </div>
+                </div>
+            @endforelse
         </div>
     </div>
 

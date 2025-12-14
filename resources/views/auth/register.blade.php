@@ -37,7 +37,7 @@
             </ul>
         </div>
 
-        <form action="{{ route('register') }}" method="POST" novalidate id="registerForm">
+        <form action="/register" method="POST" novalidate id="registerForm">
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {{-- Họ và tên --}}

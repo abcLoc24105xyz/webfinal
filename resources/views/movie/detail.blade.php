@@ -334,7 +334,7 @@
         const cleanUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
         history.replaceState(null, '', cleanUrl);
 
-        fetch(url + '?' + params.toString())
+        fetch(window.location.origin + url + '?' + params.toString())
             .then(r => r.text())
             .then(html => container.innerHTML = html);
     }

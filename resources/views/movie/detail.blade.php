@@ -156,20 +156,18 @@
             <div class="mb-10">
                 <h3 class="text-white font-bold text-3xl mb-6 text-center md:text-left border-b-2 border-purple-500/50 pb-2 inline-block">Lọc theo rạp</h3>
                 <div class="flex flex-wrap gap-4 justify-center md:justify-start">
-                    <button type="button" onclick="filterByCinema(null, '{{ $selectedDate->format('Y-m-d') }}')"
-                            class="cinema-filter-btn group relative px-8 py-4 rounded-full font-extrabold text-lg transition-all duration-300 transform hover:scale-[1.03] {{ is_null($selectedCinemaId) ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl shadow-purple-500/50 ring-4 ring-purple-400/70' : 'filter-inactive text-gray-300 hover:bg-white/10 hover:text-white' }}"
-                            data-cinema-id="">
-                        <span class="relative z-10 flex items-center gap-2">
-                            Tất cả rạp
-                        </span>
-                    </button>
+                    <a href="{{ route('movie.detail', $movie->slug) }}"
+                        class="cinema-filter-btn group relative px-8 py-4 rounded-full font-extrabold text-lg transition-all duration-300 transform hover:scale-[1.03] {{ is_null($selectedCinemaId) ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl shadow-purple-500/50 ring-4 ring-purple-400/70' : 'filter-inactive text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                            <span class="relative z-10 flex items-center gap-2">
+                                Tất cả rạp
+                            </span>
+                    </a>
 
                     @forelse($availableCinemas as $cinema)
-                        <button type="button" onclick="filterByCinema({{ $cinema->cinema_id }}, '{{ $selectedDate->format('Y-m-d') }}')"
-                                class="cinema-filter-btn group relative px-8 py-4 rounded-full font-extrabold text-lg transition-all duration-300 transform hover:scale-[1.03] {{ $selectedCinemaId == $cinema->cinema_id ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black shadow-2xl shadow-yellow-500/50 ring-4 ring-yellow-300/80' : 'filter-inactive text-gray-300 hover:bg-white/10 hover:text-white' }}"
-                                data-cinema-id="{{ $cinema->cinema_id }}">
+                        <a href="{{ route('movie.detail', [$movie->slug, 'cinema' => $cinema->cinema_id]) }}"
+                        class="cinema-filter-btn group relative px-8 py-4 rounded-full font-extrabold text-lg transition-all duration-300 transform hover:scale-[1.03] {{ $selectedCinemaId == $cinema->cinema_id ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black shadow-2xl shadow-yellow-500/50 ring-4 ring-yellow-300/80' : 'filter-inactive text-gray-300 hover:bg-white/10 hover:text-white' }}">
                             <span class="relative z-10">{{ $cinema->cinema_name }}</span>
-                        </button>
+                        </a>
                     @empty
                         <div class="text-gray-400 text-center w-full py-8 font-medium">Không có rạp nào đang chiếu phim này</div>
                     @endforelse
@@ -200,8 +198,8 @@
                             $isActive = $d->toDateString() === $selectedDate->toDateString();
                             $isEarly = $earlyDate && $d->toDateString() === $earlyDate->toDateString();
                         @endphp
-                        <button type="button" data-date="{{ $d->format('Y-m-d') }}"
-                                class="date-tab relative w-[100px] h-[110px] flex flex-col justify-center items-center rounded-2xl font-bold text-center transition-all duration-300 transform {{ $isActive ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black scale-105 shadow-xl shadow-yellow-500/50 ring-4 ring-yellow-300' : 'filter-inactive text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                        <a href="{{ route('movie.detail', [$movie->slug, 'date' => $d->format('Y-m-d')]) }}"
+                            class="date-tab relative w-[100px] h-[110px] flex flex-col justify-center items-center rounded-2xl font-bold text-center transition-all duration-300 transform {{ $isActive ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black scale-105 shadow-xl shadow-yellow-500/50 ring-4 ring-yellow-300' : 'filter-inactive text-gray-300 hover:bg-white/10 hover:text-white' }}">
                             <div class="text-4xl font-black">{{ $d->format('d') }}</div>
                             <div class="text-sm uppercase font-extrabold mt-1 {{ $isActive ? 'text-gray-900' : 'text-gray-200' }}">{{ $d->translatedFormat('D') }}</div>
                             <div class="text-xs mt-0.5 {{ $isActive ? 'text-gray-700' : 'text-gray-400' }}">{{ $d->translatedFormat('M, Y') }}</div>
@@ -222,7 +220,7 @@
                 {{ $selectedCinemaId ? 'Suất chiếu - ' . ($availableCinemas->firstWhere('cinema_id', $selectedCinemaId)->cinema_name ?? '') : 'Suất chiếu tất cả rạp' }}
             </h2>
 
-            <div id="showtimes-container" class="space-y-8">
+            <div class="space-y-8">
                 @forelse($shows as $cinemaId => $showGroup)
                     @php $cinema = $showGroup->first()->cinema @endphp
                     <div class="group bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-500">
@@ -246,7 +244,7 @@
                                         </a>
                                     @else
                                         <button type="button"
-                                                onclick="window.location.href = '{{ route('seat.selection', $show->show_id) }}'"
+                                                onclick="window.location.href = {{ route('seat.selection', $show->show_id) }}"
                                                 class="group/show relative overflow-hidden rounded-xl bg-gray-50 border-2 border-dashed border-gray-300 p-4 text-center text-gray-500 font-bold text-lg w-[140px] md:w-[150px] h-[148px] hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 flex flex-col justify-center items-center cursor-pointer">
                                             <svg class="w-12 h-12 mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -296,74 +294,6 @@
 {{-- JavaScript - chỉ chạy khi có suất chiếu --}}
 @if($hasUpcomingShows)
 <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    let currentDate = urlParams.get('date') || '{{ $selectedDate->format('Y-m-d') }}';
-    let currentCinemaId = urlParams.get('cinema') ? parseInt(urlParams.get('cinema')) : null;
-
-    function filterByCinema(cinemaId, date) {
-        currentCinemaId = cinemaId;
-        document.querySelectorAll('.cinema-filter-btn').forEach(btn => {
-            btn.classList.remove('bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'text-white', 'shadow-2xl', 'shadow-purple-500/50', 'ring-4', 'ring-purple-400/70',
-                                  'from-yellow-400', 'to-orange-500', 'text-black', 'shadow-yellow-500/50', 'ring-yellow-300/80');
-            btn.classList.add('filter-inactive', 'text-gray-300');
-        });
-
-        const selector = cinemaId === null ? '[data-cinema-id=""]' : `[data-cinema-id="${cinemaId}"]`;
-        const btn = document.querySelector('.cinema-filter-btn' + selector);
-        if (btn) {
-            btn.classList.remove('filter-inactive', 'text-gray-300');
-            if (cinemaId === null) {
-                btn.classList.add('bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'text-white', 'shadow-2xl', 'shadow-purple-500/50', 'ring-4', 'ring-purple-400/70');
-            } else {
-                btn.classList.add('bg-gradient-to-r', 'from-yellow-400', 'to-orange-500', 'text-black', 'shadow-2xl', 'shadow-yellow-500/50', 'ring-4', 'ring-yellow-300/80');
-            }
-        }
-        loadShowtimes(date, cinemaId);
-    }
-
-    function loadShowtimes(date, cinemaId) {
-        currentDate = date;
-        const container = document.getElementById('showtimes-container');
-        container.innerHTML = '<div class="text-center py-20"><svg class="animate-spin h-12 w-12 text-yellow-400 mx-auto" xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><p class="text-xl text-gray-400 mt-4">Đang tải suất chiếu...</p></div>';
-
-        let url = `{{ route('movie.showtimes', $movie->slug) }}`;
-        const params = new URLSearchParams();
-        params.append('date', date);
-        if (cinemaId) params.append('cinema', cinemaId);
-
-        const cleanUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
-        history.replaceState(null, '', cleanUrl);
-
-        fetch(window.location.origin + url + '?' + params.toString())
-            .then(r => r.text())
-            .then(html => container.innerHTML = html);
-    }
-
-    document.querySelectorAll('.date-tab').forEach(tab => {
-        tab.addEventListener('click', function () {
-            document.querySelectorAll('.date-tab').forEach(t => {
-                t.classList.remove('bg-gradient-to-r', 'from-yellow-400', 'to-orange-500', 'text-black', 'scale-105', 'ring-4', 'ring-yellow-300', 'shadow-xl', 'shadow-yellow-500/50');
-                t.classList.add('filter-inactive', 'text-gray-300');
-            });
-            this.classList.remove('filter-inactive', 'text-gray-300');
-            this.classList.add('bg-gradient-to-r', 'from-yellow-400', 'to-orange-500', 'text-black', 'scale-105', 'ring-4', 'ring-yellow-300', 'shadow-xl', 'shadow-yellow-500/50');
-            loadShowtimes(this.dataset.date, currentCinemaId);
-        });
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const initDate = urlParams.get('date') || '{{ $selectedDate->format('Y-m-d') }}';
-        const initCinema = urlParams.get('cinema') ? parseInt(urlParams.get('cinema')) : null;
-        filterByCinema(initCinema, initDate);
-
-        document.querySelectorAll('.date-tab').forEach(t => {
-            if (t.dataset.date === initDate) {
-                t.classList.remove('filter-inactive', 'text-gray-300');
-                t.classList.add('bg-gradient-to-r', 'from-yellow-400', 'to-orange-500', 'text-black', 'scale-105', 'ring-4', 'ring-yellow-300', 'shadow-xl', 'shadow-yellow-500/50');
-            }
-        });
-    });
-
     const progressHeader = document.getElementById('progress-header');
     if (progressHeader) {
         window.addEventListener('scroll', () => {

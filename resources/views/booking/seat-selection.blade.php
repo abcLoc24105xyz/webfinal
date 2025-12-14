@@ -524,7 +524,8 @@
         // LẤY TOKEN MỚI NGAY TRƯỚC KHI GỬI
         await refreshRecaptchaToken();
 
-        fetch(window.location.origin + "{{ route('seat.hold', $show->show_id) }}", {
+        const holdUrl = "{{ route('seat.hold', ['show_id' => $show->show_id]) }}";
+        fetch(holdUrl, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',

@@ -3,7 +3,7 @@ FROM php:8.2-fpm-alpine AS builder
 
 WORKDIR /app
 
-# Cài build dependencies tạm thời để compile các extension mà Composer có thể cần (gd, zip)
+# Cài build dependencies tạm thời để compile các extension mà Composer có thể cần (gd, zip, mbstring)
 RUN apk add --no-cache --virtual .build-deps \
         git \
         unzip \
@@ -67,7 +67,7 @@ COPY . .
 # Cài npm dependencies (production only)
 RUN npm ci --only=production
 
-# Tạo các thư mục cần thiết cho Laravel
+# Tạo các thư mục cần thiết cho Laravel (sửa lỗi typo "vieaws" → "views")
 RUN mkdir -p \
         storage/logs \
         storage/framework/sessions \
@@ -87,6 +87,8 @@ RUN echo '#!/bin/sh' > /start.sh \
 
 # Copy nginx config ưu tiên (nếu có file docker/nginx.conf thì dùng, nếu không thì tạo default config cho Laravel)
 RUN mkdir -p /etc/nginx/conf.d
+
+COPY docker/nginx.conf /etc/nginx/nginx.conf 2>/dev/null || true
 
 RUN cat << 'EOF' > /etc/nginx/conf.d/default.conf
 server {
@@ -113,8 +115,8 @@ server {
 }
 EOF
 
-# Optimize Composer autoload cho production
-RUN composer install --no-scripts --no-autoloader --no-interaction --prefer-dist --no-dev --ignore-platform-reqs
+# Optimize Composer autoload cho production (chỉ dump-autoload, không install lại)
+RUN composer dump-autoload --optimize --no-dev
 
 # Expose port
 EXPOSE 80

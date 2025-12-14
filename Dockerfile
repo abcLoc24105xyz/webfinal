@@ -88,9 +88,6 @@ RUN echo '#!/bin/sh' > /start.sh \
 # Tạo thư mục nginx config
 RUN mkdir -p /etc/nginx/http.d
 
-# Copy nginx.conf nếu tồn tại trong thư mục docker/, nếu không thì bỏ qua và dùng default
-COPY docker/nginx.conf /etc/nginx/nginx.conf || true
-
 # Tạo default config cho Laravel (luôn có, nếu có nginx.conf riêng thì nó sẽ include http.d/*.conf)
 RUN cat << 'EOF' > /etc/nginx/http.d/default.conf
 server {

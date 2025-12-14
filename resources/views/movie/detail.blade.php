@@ -198,15 +198,15 @@
                             $isActive = $d->toDateString() === $selectedDate->toDateString();
                             $isEarly = $earlyDate && $d->toDateString() === $earlyDate->toDateString();
                         @endphp
-                        <a href="{{ route('movie.detail', [$movie->slug, 'date' => $d->format('Y-m-d')]) }}"
-                            class="date-tab relative w-[100px] h-[110px] flex flex-col justify-center items-center rounded-2xl font-bold text-center transition-all duration-300 transform {{ $isActive ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black scale-105 shadow-xl shadow-yellow-500/50 ring-4 ring-yellow-300' : 'filter-inactive text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                        <a href="{{ url()->current() }}?date={{ $d->format('Y-m-d') }}{{ $selectedCinemaId ? '&cinema=' . $selectedCinemaId : '' }}"
+                        class="date-tab relative w-[100px] h-[110px] flex flex-col justify-center items-center rounded-2xl font-bold text-center transition-all duration-300 transform {{ $isActive ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black scale-105 shadow-xl shadow-yellow-500/50 ring-4 ring-yellow-300' : 'filter-inactive text-gray-300 hover:bg-white/10 hover:text-white' }}">
                             <div class="text-4xl font-black">{{ $d->format('d') }}</div>
                             <div class="text-sm uppercase font-extrabold mt-1 {{ $isActive ? 'text-gray-900' : 'text-gray-200' }}">{{ $d->translatedFormat('D') }}</div>
                             <div class="text-xs mt-0.5 {{ $isActive ? 'text-gray-700' : 'text-gray-400' }}">{{ $d->translatedFormat('M, Y') }}</div>
                             @if($isEarly)
                                 <span class="absolute -top-3 -right-3 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full font-black animate-pulse shadow-lg z-10">SỚM</span>
                             @endif
-                        </button>
+                        </a>
                     @endforeach
                 </div>
             </div>

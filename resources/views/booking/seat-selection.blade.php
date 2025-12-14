@@ -359,7 +359,7 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    const COMBO_ROUTE = "{{ route('combo.select') }}";
+    const COMBO_ROUTE = "https://ghiencine.onrender.com/combo-select";
     let selectedSeats = [];
     let total = 0;
 
@@ -524,7 +524,7 @@
         // LẤY TOKEN MỚI NGAY TRƯỚC KHI GỬI
         await refreshRecaptchaToken();
 
-        const holdUrl = "{{ route('seat.hold', ['show_id' => $show->show_id]) }}";
+        const holdUrl = "{{ route('seat.hold', $show->show_id) }}";
         fetch(holdUrl, {
             method: 'POST',
             headers: {

@@ -1,9 +1,18 @@
-# Build stage - chỉ cài Composer dependencies với các extension cần thiết cho composer install
+# Build stage - cài đầy đủ extensions cần thiết để Composer install thành công
 FROM php:8.2-fpm-alpine AS builder
 
 WORKDIR /app
 
-# Cài build dependencies tạm thời để compile các extension mà Composer có thể cần (gd, zip, mbstring)
+# Cài runtime libs trước (để giữ lại ở image cuối)
+RUN apk add --no-cache \
+        libpng \
+        libjpeg-turbo \
+        freetype \
+        libwebp \
+        zlib \
+        libzip
+
+# Cài build dependencies tạm thời để compile các extension cần cho Composer
 RUN apk add --no-cache --virtual .build-deps \
         git \
         unzip \
@@ -15,7 +24,7 @@ RUN apk add --no-cache --virtual .build-deps \
         zlib-dev \
         libzip-dev \
     && docker-php-ext-configure gd --with-jpeg --with-freetype --with-webp \
-    && docker-php-ext-install gd zip mbstring \
+    && docker-php-ext-install gd zip mbstring pdo pdo_mysql \
     && apk del .build-deps
 
 # Cài Composer
@@ -30,7 +39,7 @@ FROM php:8.2-fpm-alpine
 
 WORKDIR /app
 
-# Cài các runtime packages cần thiết
+# Cài các runtime packages cần thiết (bao gồm libs cho gd và zip)
 RUN apk add --no-cache \
         curl \
         libpq \
@@ -45,7 +54,7 @@ RUN apk add --no-cache \
         zlib \
         libzip
 
-# Cài các PHP extensions cần cho ứng dụng Laravel
+# Cài các PHP extensions cần cho ứng dụng Laravel tại runtime
 RUN apk add --no-cache --virtual .build-deps \
         oniguruma-dev \
         libpng-dev \
@@ -88,7 +97,10 @@ RUN echo '#!/bin/sh' > /start.sh \
 # Tạo thư mục nginx config
 RUN mkdir -p /etc/nginx/http.d
 
-# Tạo default config cho Laravel (luôn có, nếu có nginx.conf riêng thì nó sẽ include http.d/*.conf)
+# Copy nginx.conf nếu tồn tại, nếu không thì dùng default
+COPY docker/nginx.conf /etc/nginx/nginx.conf || true
+
+# Tạo default config cho Laravel (đặt trong http.d để dễ include nếu có nginx.conf riêng)
 RUN cat << 'EOF' > /etc/nginx/http.d/default.conf
 server {
     listen 80 default_server;
@@ -120,5 +132,5 @@ RUN composer dump-autoload --optimize --no-dev
 # Expose port
 EXPOSE 80
 
-# Chạy migrate (nếu cần) rồi khởi động services
+# Chạy migrate rồi khởi động services
 CMD ["sh", "-c", "php artisan migrate --force && /start.sh"]

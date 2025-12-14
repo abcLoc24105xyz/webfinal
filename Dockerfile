@@ -85,25 +85,34 @@ RUN echo '#!/bin/sh' > /start.sh \
     && echo 'nginx -g "daemon off;"' >> /start.sh \
     && chmod +x /start.sh
 
-# Copy nginx config (nếu có file docker/nginx.conf trong project)
-# Nếu không có, tạo một config cơ bản
+# Copy nginx config ưu tiên (nếu có file docker/nginx.conf thì dùng, nếu không thì tạo default config cho Laravel)
 RUN mkdir -p /etc/nginx/conf.d
-COPY docker/nginx.conf /etc/nginx/nginx.conf 2>/dev/null || \
-    (echo "server { \
-        listen 80; \
-        server_name localhost; \
-        root /app/public; \
-        index index.php; \
-        location / { \
-            try_files \$uri /index.php?\$query_string; \
-        } \
-        location ~ \.php\$ { \
-            fastcgi_pass 127.0.0.1:9000; \
-            fastcgi_index index.php; \
-            fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name; \
-            include fastcgi_params; \
-        } \
-    }" > /etc/nginx/conf.d/default.conf)
+COPY docker/nginx.conf /etc/nginx/nginx.conf 2>/dev/null || true
+
+RUN cat << 'EOF' > /etc/nginx/conf.d/default.conf
+server {
+    listen 80;
+    server_name localhost;
+
+    root /app/public;
+    index index.php index.html index.htm;
+
+    location / {
+        try_files $uri /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
+EOF
 
 # Optimize Composer autoload cho production
 RUN composer dump-autoload --optimize --no-dev

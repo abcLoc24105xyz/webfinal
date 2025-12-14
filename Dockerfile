@@ -114,7 +114,7 @@ server {
 EOF
 
 # Optimize Composer autoload cho production
-RUN composer dump-autoload --optimize --no-dev
+RUN composer install --no-scripts --no-autoloader --no-interaction --prefer-dist --no-dev --ignore-platform-reqs
 
 # Expose port
 EXPOSE 80

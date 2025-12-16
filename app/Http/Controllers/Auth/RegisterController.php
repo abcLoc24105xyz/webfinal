@@ -61,10 +61,10 @@ class RegisterController extends Controller
 
             Log::info('User created successfully', ['user_id' => $user->user_id, 'email' => $request->email]);
 
-            // Gửi mail OTP với queue (để tránh block nếu mail chậm)
-            Mail::to($request->email)->queue(new OtpMail($otp, $request->full_name, 'register'));
+            // Gửi mail OTP (đã test thành công với config của bạn)
+            Mail::to($request->email)->send(new OtpMail($otp, $request->full_name, 'register'));
 
-            Log::info('OTP mail queued successfully', ['email' => $request->email]);
+            Log::info('OTP mail sent successfully', ['email' => $request->email, 'otp' => $otp]);
 
             // Lưu email vào session
             $request->session()->put('email', $request->email);

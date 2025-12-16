@@ -74,6 +74,11 @@
                 </div>
             </div>
 
+            {{-- Thông báo mật khẩu khớp / không khớp --}}
+            <div id="passwordMatchIndicator" class="mt-4 p-3 bg-gray-100 rounded-lg text-sm hidden">
+                <span id="matchText" class="text-gray-600">Mật khẩu xác nhận không khớp</span>
+            </div>
+
             <button type="submit" id="submitBtn" class="w-full mt-8 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg py-4 rounded-xl hover:shadow-2xl transition">
                 Đăng ký ngay & nhận mã OTP
             </button>
@@ -89,26 +94,40 @@
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('registerForm');
         const submitBtn = document.getElementById('submitBtn');
-
-        form.addEventListener('submit', function(e) {
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = 'Đang xử lý... <span class="animate-spin inline-block ml-2">⟳</span>';
-        });
-
-        // Kiểm tra mật khẩu khớp
         const passwordInput = document.getElementById('passwordInput');
         const passwordConfirmInput = document.getElementById('passwordConfirmInput');
+        const matchIndicator = document.getElementById('passwordMatchIndicator');
+        const matchText = document.getElementById('matchText');
 
         function checkPasswordMatch() {
-            if (passwordInput.value && passwordConfirmInput.value && passwordInput.value === passwordConfirmInput.value) {
+            if (passwordInput.value.length === 0 || passwordConfirmInput.value.length === 0) {
+                matchIndicator.classList.add('hidden');
+                submitBtn.disabled = false;
+                return;
+            }
+
+            if (passwordInput.value === passwordConfirmInput.value) {
+                matchIndicator.classList.remove('hidden');
+                matchText.textContent = '✓ Mật khẩu khớp';
+                matchText.className = 'text-green-600 font-medium';
                 submitBtn.disabled = false;
             } else {
+                matchIndicator.classList.remove('hidden');
+                matchText.textContent = '✗ Mật khẩu xác nhận không khớp';
+                matchText.className = 'text-red-600 font-medium';
                 submitBtn.disabled = true;
             }
         }
 
+        // Kiểm tra khi nhập
         passwordInput.addEventListener('input', checkPasswordMatch);
         passwordConfirmInput.addEventListener('input', checkPasswordMatch);
+
+        // Khi submit: chỉ đổi nút thành "Đang xử lý..." (không preventDefault để form submit bình thường)
+        form.addEventListener('submit', function() {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Đang xử lý... <span class="animate-spin inline-block ml-2">⟳</span>';
+        });
     });
 </script>
 @endsection

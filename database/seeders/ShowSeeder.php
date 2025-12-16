@@ -10,7 +10,7 @@ class ShowSeeder extends Seeder
 {
     public function run(): void
     {
-        // XÓA DỮ LIỆU CŨ AN TOÀN (không dùng truncate vì bị ràng buộc foreign key)
+        // Xóa dữ liệu cũ an toàn
         DB::table('shows')->delete();
 
         $shows = [];
@@ -24,13 +24,30 @@ class ShowSeeder extends Seeder
             2 => ['R201', 'R202', 'R203', 'R204'],
         ];
 
-        // Các khung giờ chiếu cố định
-        $startTimes = ['09:00:00', '11:30:00', '14:00:00', '16:30:00', '19:00:00', '21:30:00'];
+        // Thêm nhiều khung giờ chiếu hơn (từ 8h sáng đến 23h30, mỗi 30 phút hoặc linh hoạt)
+        $startTimes = [
+            '08:00:00', '08:30:00',
+            '09:00:00', '09:30:00',
+            '10:00:00', '10:30:00',
+            '11:00:00', '11:30:00',
+            '12:00:00', '12:30:00',
+            '13:00:00', '13:30:00',
+            '14:00:00', '14:30:00',
+            '15:00:00', '15:30:00',
+            '16:00:00', '16:30:00',
+            '17:00:00', '17:30:00',
+            '18:00:00', '18:30:00',
+            '19:00:00', '19:30:00',
+            '20:00:00', '20:30:00',
+            '21:00:00', '21:30:00',
+            '22:00:00', '22:30:00',
+            '23:00:00', '23:30:00',
+        ];
 
         // Tạo suất chiếu cho 10 ngày kể từ hôm nay
         $startDate = Carbon::today();
 
-        $globalCounter = 1; // Đếm toàn cục để xxx tăng liên tục, đảm bảo unique
+        $globalCounter = 1; // Đếm toàn cục để xxx tăng liên tục
 
         for ($day = 0; $day < 10; $day++) {
             $showDate = $startDate->copy()->addDays($day)->format('Y-m-d');
@@ -38,8 +55,8 @@ class ShowSeeder extends Seeder
 
             foreach ($cinemaRooms as $cinemaId => $rooms) {
                 foreach ($rooms as $room) {
-                    // Mỗi phòng mỗi ngày có 3-5 suất chiếu ngẫu nhiên
-                    $numShows = rand(3, 5);
+                    // Mỗi phòng mỗi ngày có 6-10 suất chiếu ngẫu nhiên (nhiều hơn)
+                    $numShows = rand(6, 10);
                     $usedTimes = [];
 
                     for ($i = 0; $i < $numShows; $i++) {
@@ -66,7 +83,7 @@ class ShowSeeder extends Seeder
                             ->where('room_code', $room)
                             ->value('total_seats') ?? 80;
 
-                        // Tạo show_id dạng SHOWyyyyMMddxxx (xxx tăng toàn cục)
+                        // Tạo show_id dạng SHOWyyyyMMddxxx
                         $sequence = str_pad($globalCounter, 3, '0', STR_PAD_LEFT);
                         $showId = 'SHOW' . $dateFormatted . $sequence;
 

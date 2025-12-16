@@ -74,7 +74,7 @@
                 </div>
             </div>
 
-            <button type="submit" id="submitBtn" class="w-full mt-8 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg py-4 rounded-xl hover:shadow-2xl transition disabled:opacity-50 disabled:cursor-not-allowed">
+            <button type="submit" id="submitBtn" class="w-full mt-8 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg py-4 rounded-xl hover:shadow-2xl transition">
                 Đăng ký ngay & nhận mã OTP
             </button>
         </form>
@@ -90,24 +90,17 @@
         const form = document.getElementById('registerForm');
         const submitBtn = document.getElementById('submitBtn');
 
-        // Xử lý submit form
         form.addEventListener('submit', function(e) {
-            // Không chặn submit (không dùng e.preventDefault())
             submitBtn.disabled = true;
             submitBtn.innerHTML = 'Đang xử lý... <span class="animate-spin inline-block ml-2">⟳</span>';
         });
 
-        // Kiểm tra mật khẩu khớp (chỉ để UX tốt hơn)
+        // Kiểm tra mật khẩu khớp
         const passwordInput = document.getElementById('passwordInput');
         const passwordConfirmInput = document.getElementById('passwordConfirmInput');
 
         function checkPasswordMatch() {
-            if (passwordInput.value.length === 0 || passwordConfirmInput.value.length === 0) {
-                submitBtn.disabled = false;
-                return;
-            }
-
-            if (passwordInput.value === passwordConfirmInput.value) {
+            if (passwordInput.value && passwordConfirmInput.value && passwordInput.value === passwordConfirmInput.value) {
                 submitBtn.disabled = false;
             } else {
                 submitBtn.disabled = true;

@@ -50,13 +50,13 @@
 
     #content-start { padding-top: calc(7rem + 1px); }
 
-    /* Thêm class active cho ngày và rạp */
+    /* Class active cho ngày và rạp */
     .date-tab.active {
-        background: linear-gradient(to right, #fbbf24, #fb923c);
-        color: black;
+        background: linear-gradient(to right, #fbbf24, #fb923c) !important;
+        color: black !important;
         transform: scale(1.05);
         box-shadow: 0 10px 25px rgba(251, 146, 60, 0.4);
-        ring: 4px solid #fef08a;
+        border: 4px solid #fef08a;
     }
     .date-tab.early-active::after {
         content: "SỚM";
@@ -66,27 +66,27 @@
         background: #dc2626;
         color: white;
         font-size: 0.65rem;
-        font-weight: black;
+        font-weight: 900;
         padding: 0.125rem 0.5rem;
         border-radius: 9999px;
         animation: pulse 2s infinite;
     }
 
     .cinema-filter-btn.active {
-        background: linear-gradient(to right, #fbbf24, #fb923c);
-        color: black;
+        background: linear-gradient(to right, #fbbf24, #fb923c) !important;
+        color: black !important;
         box-shadow: 0 10px 25px rgba(251, 146, 60, 0.4);
-        ring: 4px solid #fef08a;
+        border: 4px solid #fef08a;
     }
     .cinema-filter-btn.all-active {
-        background: linear-gradient(to right, #9333ea, #ec4899);
-        color: white;
+        background: linear-gradient(to right, #9333ea, #ec4899) !important;
+        color: white !important;
         box-shadow: 0 10px 25px rgba(147, 51, 234, 0.4);
-        ring: 4px solid #c084fc;
+        border: 4px solid #c084fc;
     }
 </style>
 
-{{-- Thanh tiến trình (Sticky) - chỉ hiển thị khi đang đặt vé --}}
+{{-- Thanh tiến trình (Sticky) --}}
 @auth
 <div id="progress-header" class="fixed top-20 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-white/10 transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 py-3 md:py-4">
@@ -181,9 +181,7 @@
     </div>
 </div>
 
-{{-- CHỈ HIỂN THỊ PHẦN NÀY KHI CÓ SUẤT CHIẾU TRONG TƯƠNG LAI --}}
 @if($hasUpcomingShows)
-
     {{-- Bộ lọc --}}
     <div class="py-12 px-4 bg-slate-900/50 backdrop-blur-sm border-t border-b border-white/10">
         <div class="max-w-6xl mx-auto">
@@ -192,15 +190,15 @@
                 <h3 class="text-white font-bold text-3xl mb-6 text-center md:text-left border-b-2 border-purple-500/50 pb-2 inline-block">Lọc theo rạp</h3>
                 <div class="flex flex-wrap gap-4 justify-center md:justify-start">
                     <a href="{{ route('movie.detail', $movie->slug) }}"
-                        class="cinema-filter-btn group relative px-8 py-4 rounded-full font-extrabold text-lg transition-all duration-300 transform hover:scale-[1.03] {{ is_null($selectedCinemaId) ? 'active all-active' : 'filter-inactive text-gray-300 hover:bg-white/10 hover:text-white' }}">
-                            <span class="relative z-10 flex items-center gap-2">
-                                Tất cả rạp
-                            </span>
+                       data-cinema=""
+                       class="cinema-filter-btn group relative px-8 py-4 rounded-full font-extrabold text-lg transition-all duration-300 transform hover:scale-[1.03] filter-inactive text-gray-300 hover:bg-white/10 hover:text-white {{ is_null($selectedCinemaId) ? 'active all-active' : '' }}">
+                        <span class="relative z-10 flex items-center gap-2">Tất cả rạp</span>
                     </a>
 
                     @forelse($availableCinemas as $cinema)
                         <a href="{{ route('movie.detail', [$movie->slug, 'cinema' => $cinema->cinema_id]) }}"
-                        class="cinema-filter-btn group relative px-8 py-4 rounded-full font-extrabold text-lg transition-all duration-300 transform hover:scale-[1.03] {{ $selectedCinemaId == $cinema->cinema_id ? 'active' : 'filter-inactive text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                           data-cinema="{{ $cinema->cinema_id }}"
+                           class="cinema-filter-btn group relative px-8 py-4 rounded-full font-extrabold text-lg transition-all duration-300 transform hover:scale-[1.03] filter-inactive text-gray-300 hover:bg-white/10 hover:text-white {{ $selectedCinemaId == $cinema->cinema_id ? 'active' : '' }}">
                             <span class="relative z-10">{{ $cinema->cinema_name }}</span>
                         </a>
                     @empty
@@ -259,9 +257,8 @@
             @include('movie.partials.showtimes')
         </div>
     </div>
-
 @else
-    {{-- KHÔNG CÓ SUẤT CHIẾU TRONG TƯƠNG LAI → HIỂN THỊ THÔNG BÁO ĐẸP --}}
+    {{-- Không có suất chiếu --}}
     <div class="py-32 bg-gradient-to-b from-slate-900 to-black px-4">
         <div class="max-w-4xl mx-auto text-center">
             <div class="inline-block bg-white/10 backdrop-blur-xl rounded-3xl px-16 py-20 border border-white/20 shadow-2xl">
@@ -283,7 +280,7 @@
     </div>
 @endif
 
-{{-- JAVASCRIPT - ĐÃ SỬA ĐỂ HOẠT ĐỘNG SAU AJAX --}}
+{{-- JavaScript đã được sửa hoàn chỉnh --}}
 @if($hasUpcomingShows)
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -295,24 +292,20 @@
         }
 
         function updateActiveStates(date = null, cinema = null) {
-            // Update ngày
+            // Cập nhật ngày
             document.querySelectorAll('.date-tab').forEach(tab => {
-                tab.classList.remove('active', 'early-active');
-                if (date && tab.dataset.date === date) {
-                    tab.classList.add('active');
-                    if (tab.querySelector('span[style*="red"]') || tab.innerHTML.includes('SỚM')) {
-                        tab.classList.add('early-active');
-                    }
-                }
+                tab.classList.toggle('active', tab.dataset.date === date);
+                tab.classList.toggle('early-active', tab.dataset.date === date && tab.innerHTML.includes('SỚM'));
             });
 
-            // Update rạp
+            // Cập nhật rạp
             document.querySelectorAll('.cinema-filter-btn').forEach(btn => {
+                const btnCinema = btn.dataset.cinema || null;
                 btn.classList.remove('active', 'all-active');
-                const btnCinema = new URL(btn.href).searchParams.get('cinema');
-                if (!cinema && !btnCinema) {
+
+                if (cinema === null && btnCinema === '') {
                     btn.classList.add('active', 'all-active');
-                } else if (btnCinema == cinema) {
+                } else if (String(btnCinema) === String(cinema)) {
                     btn.classList.add('active');
                 }
             });
@@ -323,7 +316,7 @@
             let ajaxUrl = `/phim/${slug}/suat-chieu`;
             const params = new URLSearchParams();
             if (date) params.append('date', date);
-            if (cinema) params.append('cinema', cinema);
+            if (cinema !== null) params.append('cinema', cinema);
             if (params.toString()) ajaxUrl += '?' + params.toString();
 
             const container = document.querySelector('[data-shows-container]');
@@ -340,46 +333,50 @@
                     container.innerHTML = html;
                     updateActiveStates(date, cinema);
                 })
-                .catch(error => {
-                    console.error('Lỗi:', error);
+                .catch(err => {
+                    console.error('Lỗi AJAX:', err);
                     container.innerHTML = '<div class="text-center py-20"><p class="text-red-500 text-2xl">Lỗi tải dữ liệu</p></div>';
                 });
         }
 
-        // Sự kiện click ngày
-        document.querySelectorAll('a.date-tab').forEach(link => {
-            link.addEventListener('click', function(e) {
+        // Click ngày
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('a.date-tab')) {
                 e.preventDefault();
-                const date = this.dataset.date;
-                const cinema = new URLSearchParams(window.location.search).get('cinema');
-                loadShowsAjax(date, cinema);
+                const link = e.target.closest('a.date-tab');
+                const date = link.dataset.date;
+                const currentCinema = new URLSearchParams(window.location.search).get('cinema');
+
+                loadShowsAjax(date, currentCinema || null);
 
                 const newUrl = new URL(window.location);
                 newUrl.searchParams.set('date', date);
-                if (!cinema) newUrl.searchParams.delete('cinema');
+                if (!currentCinema) newUrl.searchParams.delete('cinema');
                 window.history.pushState({}, '', newUrl);
-            });
+            }
         });
 
-        // Sự kiện click rạp
-        document.querySelectorAll('a.cinema-filter-btn').forEach(link => {
-            link.addEventListener('click', function(e) {
+        // Click rạp
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('a.cinema-filter-btn')) {
                 e.preventDefault();
-                const url = new URL(this.href);
-                const cinema = url.searchParams.get('cinema');
-                const date = new URLSearchParams(window.location.search).get('date') || 
-                              document.querySelector('a.date-tab')?.dataset.date;
+                const link = e.target.closest('a.cinema-filter-btn');
+                const cinema = link.dataset.cinema || null;
+                const currentDate = new URLSearchParams(window.location.search).get('date') ||
+                                    document.querySelector('.date-tab.active')?.dataset.date ||
+                                    document.querySelector('a.date-tab')?.dataset.date;
 
-                loadShowsAjax(date, cinema);
+                loadShowsAjax(currentDate, cinema);
 
-                window.history.pushState({}, '', this.href);
-            });
+                window.history.pushState({}, '', link.href);
+            }
         });
 
         // Khởi tạo trạng thái active ban đầu
-        const currentDate = new URLSearchParams(window.location.search).get('date');
-        const currentCinema = new URLSearchParams(window.location.search).get('cinema');
-        updateActiveStates(currentDate, currentCinema);
+        const initDate = new URLSearchParams(window.location.search).get('date') ||
+                         document.querySelector('.date-tab')?.dataset.date;
+        const initCinema = new URLSearchParams(window.location.search).get('cinema');
+        updateActiveStates(initDate, initCinema);
     });
 </script>
 @endif

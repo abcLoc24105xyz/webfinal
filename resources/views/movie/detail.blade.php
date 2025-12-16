@@ -51,7 +51,7 @@
     #content-start { padding-top: calc(7rem + 1px); }
 </style>
 
-{{-- Thanh tiến trình (Sticky) - chỉ hiện khi đang đặt vé --}}
+{{-- Thanh tiến trình (Sticky) - chỉ hiển thị khi đang đặt vé --}}
 @auth
 <div id="progress-header" class="fixed top-20 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-white/10 transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 py-3 md:py-4">
@@ -146,7 +146,7 @@
     </div>
 </div>
 
-{{-- CHỈ HIỆN PHẦN NÀY KHI CÓ SUẤT CHIẾU TRONG TƯƠNG LAI --}}
+{{-- CHỈ HIỂN THỊ PHẦN NÀY KHI CÓ SUẤT CHIẾU TRONG TƯƠNG LAI --}}
 @if($hasUpcomingShows)
 
     {{-- Bộ lọc --}}
@@ -213,8 +213,8 @@
         </div>
     </div>
 
-    {{-- Danh sách suất chiếu --}}
-    <div class="py-16 bg-gradient-to-br from-slate-800 to-black px-4">
+    {{-- ✅ THÊM ATTRIBUTE data-shows-container TẠI ĐÂY --}}
+    <div class="py-16 bg-gradient-to-br from-slate-800 to-black px-4" data-shows-container>
         <div class="max-w-6xl mx-auto">
             <h2 class="text-4xl font-heading font-black text-center text-white mb-12">
                 {{ $selectedCinemaId ? 'Suất chiếu - ' . ($availableCinemas->firstWhere('cinema_id', $selectedCinemaId)->cinema_name ?? '') : 'Suất chiếu tất cả rạp' }}
@@ -268,7 +268,7 @@
     </div>
 
 @else
-    {{-- KHÔNG CÓ SUẤT CHIẾU TRONG TƯƠNG LAI → HIỆN THÔNG BÁO ĐẸP --}}
+    {{-- KHÔNG CÓ SUẤT CHIẾU TRONG TƯƠNG LAI → HIỂN THỊ THÔNG BÁO ĐẸP --}}
     <div class="py-32 bg-gradient-to-b from-slate-900 to-black px-4">
         <div class="max-w-4xl mx-auto text-center">
             <div class="inline-block bg-white/10 backdrop-blur-xl rounded-3xl px-16 py-20 border border-white/20 shadow-2xl">
@@ -276,7 +276,7 @@
                     <h2 class="text-5xl md:text-4xl font-black text-purple-400 mb-6">SẮP CHIẾU</h2>
                     <p class="text-2xl text-gray-300 mb-8">Phim sẽ chính thức khởi chiếu vào</p>
                     <p class="text-6xl font-black text-yellow-400">{{ $releaseDate?->translatedFormat('d/m/Y') ?? 'Chưa xác định' }}</p>
-                    <p class="text-xl text-gray-400 mt-8">Hãy theo dõi để đặt vé sớm nhé!</p>
+                    <p class="text-xl text-gray-400 mt-8">Hãy theo dõi để đặt vé sớm nhất!</p>
                 @else
                     <h2 class="text-5xl md:text-4xl font-black text-red-500 mb-6">HIỆN TẠI CHƯA CÓ SUẤT CHIẾU</h2>
                     <p class="text-2xl text-gray-300">Cảm ơn bạn đã quan tâm đến bộ phim này! Bạn có thể xem danh sách phim có suất chiếu bằng liên kết dưới đây</p>
@@ -290,7 +290,7 @@
     </div>
 @endif
 
-{{-- JavaScript - chỉ chạy khi có suất chiếu --}}
+{{-- ✅ JAVASCRIPT FIX CHỌN NGÀY --}}
 @if($hasUpcomingShows)
 <script>
     const progressHeader = document.getElementById('progress-header');
@@ -298,6 +298,68 @@
         window.addEventListener('scroll', () => {
             progressHeader.classList.toggle('progress-scrolled', window.scrollY > 100);
         });
+    }
+
+    // FIX AJAX: Load Shows khi chọn ngày
+    document.querySelectorAll('a.date-tab').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const url = new URL(this.href);
+            const date = url.searchParams.get('date');
+            const cinema = url.searchParams.get('cinema');
+
+            loadShowsAjax(date, cinema);
+            window.history.pushState({}, '', this.href);
+        });
+    });
+
+    // FIX AJAX: Load Shows khi chọn rạp
+    document.querySelectorAll('a.cinema-filter-btn').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const url = new URL(this.href);
+            const cinema = url.searchParams.get('cinema');
+            
+            // Lấy ngày hiện tại từ URL hoặc ngày đầu tiên
+            const currentDate = new URL(window.location).searchParams.get('date') || 
+                              document.querySelector('a.date-tab')?.href.split('date=')[1]?.split('&')[0];
+
+            loadShowsAjax(currentDate, cinema);
+            
+            // Cập nhật URL
+            const newUrl = this.href;
+            window.history.pushState({}, '', newUrl);
+        });
+    });
+
+    function loadShowsAjax(date, cinema = null) {
+        const slug = '{{ $movie->slug }}';
+        let ajaxUrl = `/phim/${slug}/suat-chieu?date=${date}`;
+        if (cinema) ajaxUrl += `&cinema=${cinema}`;
+
+        const container = document.querySelector('[data-shows-container]');
+        if (!container) {
+            console.error('Container not found');
+            return;
+        }
+
+        // Thêm loading state
+        container.innerHTML = '<div class="text-center py-20"><p class="text-white text-2xl">Đang tải...</p></div>';
+
+        fetch(ajaxUrl)
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return response.text();
+            })
+            .then(html => {
+                container.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+                container.innerHTML = '<div class="text-center py-20"><p class="text-red-500 text-2xl">Lỗi tải dữ liệu</p></div>';
+            });
     }
 </script>
 @endif

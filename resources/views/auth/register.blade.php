@@ -26,7 +26,7 @@
         @endif
 
         <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700">
-            <strong>📋 Yêu cầu mật khẩu:</strong>
+            <strong>Yêu cầu mật khẩu:</strong>
             <ul class="mt-2 space-y-1 text-xs">
                 <li>✓ Tối thiểu 8 ký tự</li>
                 <li>✓ Chứa chữ hoa (A-Z)</li>

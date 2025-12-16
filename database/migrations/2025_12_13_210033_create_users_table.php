@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -6,7 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void {
         Schema::create('users', function (Blueprint $table) {
-            $table->unsignedInteger('user_id')->primary();
+            // Đổi từ unsignedInteger thành id() để tự động AUTO_INCREMENT
+            $table->id('user_id'); // ← Đây là thay đổi quan trọng nhất
+
             $table->string('full_name', 150)->nullable();
             $table->string('email', 150)->unique('uq_email');
             $table->string('password', 255);
@@ -21,8 +24,9 @@ return new class extends Migration {
             $table->string('provider_id', 255)->nullable()->unique();
             $table->text('provider_avatar')->nullable();
             $table->tinyInteger('status')->default(1);
-            $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+
+            // Giữ created_at và updated_at bình thường
+            $table->timestamps();
         });
     }
 

@@ -1,78 +1,67 @@
 <?php
-namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
-class ShowSeeder extends Seeder {
-    public function run(): void {
-        $shows = [];
-        $showId = 1;
-        
-        // Movies để chiếu: 1,2,3,4,5
-        $movies = [1, 2, 3, 4, 5];
-        $cinemas = [1, 2];
-        
-        // Room mapping
-        $cinemaRooms = [
-            1 => ['R101', 'R102', 'R103', 'R104', 'R105'],
-            2 => ['R201', 'R202', 'R203', 'R204']
+class ShowSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // Danh sách movie_id và cinema_id (giả sử đã có từ seeder trước)
+        $movieIds = [1, 2, 3, 4, 5]; // Thay bằng movie_id thực tế nếu cần
+        $cinemas = [
+            1 => ['R101', 'R102', 'R103', 'R104', 'R105'], // cinema_id 1
+            2 => ['R201', 'R202', 'R203', 'R204'],           // cinema_id 2
         ];
-        
-        $startTimes = ['09:00:00', '11:30:00', '14:00:00', '16:30:00', '19:00:00', '21:30:00'];
-        
-        // Tạo shows cho 10 ngày từ hôm nay
-        for ($day = 0; $day < 10; $day++) {
-            $showDate = now()->addDays($day)->toDateString();
-            
-            foreach ($cinemas as $cinema) {
-                foreach ($cinemaRooms[$cinema] as $roomCode) {
-                    // Random 2-4 shows per room per day
-                    $numShows = rand(2, 4);
-                    $usedTimes = [];
-                    
+
+        $seats = [
+            'R101' => 80, 'R102' => 60, 'R103' => 90, 'R104' => 80, 'R105' => 120,
+            'R201' => 80, 'R202' => 100, 'R203' => 120, 'R204' => 120,
+        ];
+
+        $startDate = Carbon::parse('2025-12-17');
+        $endDate = Carbon::parse('2025-12-26');
+
+        $shows = [];
+
+        for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+            foreach ($cinemas as $cinemaId => $rooms) {
+                foreach ($rooms as $room) {
+                    // Mỗi phòng có khoảng 4-6 suất chiếu/ngày
+                    $numShows = rand(4, 6);
+
                     for ($i = 0; $i < $numShows; $i++) {
-                        $movie = $movies[array_rand($movies)];
-                        $startTime = $startTimes[array_rand($startTimes)];
-                        
-                        // Tránh duplicate time
-                        while (in_array($startTime, $usedTimes)) {
-                            $startTime = $startTimes[array_rand($startTimes)];
-                        }
-                        $usedTimes[] = $startTime;
-                        
-                        // Lấy duration từ movie
-                        $movieDuration = DB::table('movies')
-                            ->where('movie_id', $movie)
-                            ->value('duration');
-                        
-                        $startTimeObj = \DateTime::createFromFormat('H:i:s', $startTime);
-                        $endTimeObj = clone $startTimeObj;
-                        $endTimeObj->add(new \DateInterval('PT' . $movieDuration . 'M'));
-                        $endTime = $endTimeObj->format('H:i:s');
-                        
-                        // Lấy total_seats từ room
-                        $totalSeats = DB::table('rooms')
-                            ->where('room_code', $roomCode)
-                            ->value('total_seats');
-                        
+                        $movieId = $movieIds[array_rand($movieIds)];
+
+                        // Giờ bắt đầu ngẫu nhiên từ 09:00 đến 21:30
+                        $hour = rand(9, 21);
+                        $minute = [0, 30][rand(0, 1)];
+                        $startTime = sprintf('%02d:%02d:00', $hour, $minute);
+
+                        // Thời lượng phim ngẫu nhiên 120-180 phút
+                        $duration = rand(120, 180);
+                        $endTime = Carbon::createFromFormat('H:i:s', $startTime)
+                            ->addMinutes($duration)
+                            ->format('H:i:s');
+
                         $shows[] = [
-                            'show_id' => bin2hex(str_pad($showId, 16, '0', STR_PAD_LEFT)),
-                            'movie_id' => $movie,
-                            'cinema_id' => $cinema,
-                            'room_code' => $roomCode,
-                            'show_date' => $showDate,
-                            'start_time' => $startTime,
-                            'end_time' => $endTime,
-                            'remaining_seats' => $totalSeats,
+                            'cinema_id'       => $cinemaId,
+                            'movie_id'        => $movieId,
+                            'room_code'       => $room,
+                            'show_date'       => $date->toDateString(),
+                            'start_time'      => $startTime,
+                            'end_time'        => $endTime,
+                            'remaining_seats' => $seats[$room],
+                            'created_at'      => now(),
+                            'updated_at'      => now(),
                         ];
-                        
-                        $showId++;
                     }
                 }
             }
         }
-        
+
+        // Insert batch để nhanh và tránh lỗi
         DB::table('shows')->insert($shows);
     }
 }

@@ -3,13 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;  // ← BẮT BUỘC PHẢI CÓ DÒNG NÀY!
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable; // ← PHẢI CÓ HasFactory!!!
+    use HasFactory, Notifiable;
 
     protected $table = 'users';
     protected $primaryKey = 'user_id';
@@ -26,6 +26,7 @@ class User extends Authenticatable
         'password_changed_at',
         'ava',
         'provider', 'provider_id', 'provider_avatar',
+        'email_verified_at',  // Thêm để tránh lỗi khi update
     ];
 
     protected $hidden = [

@@ -12,7 +12,7 @@ class OtpMail extends Mailable
 
     public $otp;
     public $name;
-    public $type; // 'register' hoặc 'reset'
+    public $type;
 
     public function __construct($otp, $name = null, $type = 'register')
     {

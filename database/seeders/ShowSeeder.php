@@ -10,6 +10,9 @@ class ShowSeeder extends Seeder
 {
     public function run(): void
     {
+        // XÓA DỮ LIỆU CŨ AN TOÀN (không dùng truncate vì bị ràng buộc foreign key)
+        DB::table('shows')->delete();
+
         $shows = [];
 
         // Danh sách movie_id có sẵn
@@ -27,9 +30,11 @@ class ShowSeeder extends Seeder
         // Tạo suất chiếu cho 10 ngày kể từ hôm nay
         $startDate = Carbon::today();
 
+        $globalCounter = 1; // Đếm toàn cục để xxx tăng liên tục, đảm bảo unique
+
         for ($day = 0; $day < 10; $day++) {
-            $showDate = $startDate->copy()->addDays($day);
-            $dateFormatted = $showDate->format('Ymd'); // yyyyMMdd
+            $showDate = $startDate->copy()->addDays($day)->format('Y-m-d');
+            $dateFormatted = $startDate->copy()->addDays($day)->format('Ymd'); // yyyyMMdd
 
             foreach ($cinemaRooms as $cinemaId => $rooms) {
                 foreach ($rooms as $room) {
@@ -37,13 +42,11 @@ class ShowSeeder extends Seeder
                     $numShows = rand(3, 5);
                     $usedTimes = [];
 
-                    $dailyCounter = 1; // Đếm thứ tự suất trong ngày để tạo xxx
-
                     for ($i = 0; $i < $numShows; $i++) {
                         // Chọn phim ngẫu nhiên
                         $movieId = $movieIds[array_rand($movieIds)];
 
-                        // Chọn giờ bắt đầu ngẫu nhiên, tránh trùng
+                        // Chọn giờ bắt đầu ngẫu nhiên, tránh trùng trong phòng
                         do {
                             $startTime = $startTimes[array_rand($startTimes)];
                         } while (in_array($startTime, $usedTimes));
@@ -52,7 +55,7 @@ class ShowSeeder extends Seeder
                         // Tính giờ kết thúc dựa trên thời lượng phim
                         $movieDuration = DB::table('movies')
                             ->where('movie_id', $movieId)
-                            ->value('duration') ?? 120; // mặc định 120 phút
+                            ->value('duration') ?? 120;
 
                         $startTimeObj = Carbon::createFromFormat('H:i:s', $startTime);
                         $endTimeObj = $startTimeObj->copy()->addMinutes($movieDuration);
@@ -63,8 +66,8 @@ class ShowSeeder extends Seeder
                             ->where('room_code', $room)
                             ->value('total_seats') ?? 80;
 
-                        // Tạo show_id dạng SHOWyyyyMMddxxx
-                        $sequence = str_pad($dailyCounter, 3, '0', STR_PAD_LEFT); // xxx = 3 chữ số
+                        // Tạo show_id dạng SHOWyyyyMMddxxx (xxx tăng toàn cục)
+                        $sequence = str_pad($globalCounter, 3, '0', STR_PAD_LEFT);
                         $showId = 'SHOW' . $dateFormatted . $sequence;
 
                         $shows[] = [
@@ -72,21 +75,19 @@ class ShowSeeder extends Seeder
                             'movie_id'        => $movieId,
                             'cinema_id'       => $cinemaId,
                             'room_code'       => $room,
-                            'show_date'       => $showDate->toDateString(),
+                            'show_date'       => $showDate,
                             'start_time'      => $startTime,
                             'end_time'        => $endTime,
                             'remaining_seats' => $totalSeats,
-                            'created_at'      => now(),
-                            'updated_at'      => now(),
                         ];
 
-                        $dailyCounter++;
+                        $globalCounter++;
                     }
                 }
             }
         }
 
-        // Insert tất cả suất chiếu một lần
+        // Insert batch
         DB::table('shows')->insert($shows);
     }
 }

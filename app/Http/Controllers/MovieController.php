@@ -69,45 +69,32 @@ class MovieController extends Controller
             ->when($selectedCinemaId, fn($q) => $q->where('cinema_id', $selectedCinemaId))
             ->distinct()
             ->orderBy('show_date')
-            ->pluck('show_date'); // ← Đây là Carbon object
+            ->pluck('show_date'); // Carbon object
 
-        // === SỬA TỪ ĐÂY ===
+        // Xử lý suất chiếu sớm
         if ($hasEarlyPremiere) {
             $earlyDateStr = $earlyPremiereDate->toDateString();
 
-            // Chuẩn hóa tất cả về string để so sánh
-            $availableDates = $availableDates->map(fn($date) => $date instanceof \Carbon\Carbon ? $date->toDateString() : (string)$date);
+            $availableDates = $availableDates->map(fn($date) => $date instanceof Carbon ? $date->toDateString() : (string)$date);
 
-            // Chỉ thêm nếu chưa có
             if (!$availableDates->contains($earlyDateStr)) {
                 $availableDates->prepend($earlyDateStr);
             }
 
-            // Loại trùng và sắp xếp lại
             $availableDates = $availableDates->unique()->values();
         }
 
         // Xử lý suất chiếu sớm theo rạp được chọn
-        if ($hasEarlyPremiere) {
-            if ($selectedCinemaId) {
-                $hasEarlyShowInCinema = Show::where('movie_id', $movie->movie_id)
-                    ->where('cinema_id', $selectedCinemaId)
-                    ->whereDate('show_date', $earlyPremiereDate)
-                    ->where('remaining_seats', '>', 0)
-                    ->whereRaw("CONCAT(show_date, ' ', start_time) > ?", [$now])
-                    ->exists();
-                
-                if (!$hasEarlyShowInCinema) {
-                    $hasEarlyPremiere = false;
-                }
-            }
-
-            // Thêm ngày suất sớm vào danh sách
-            if ($hasEarlyPremiere) {
-                $availableDates = $availableDates->filter(
-                    fn($date) => $date !== $earlyPremiereDate->toDateString()
-                )->values();
-                $availableDates->prepend($earlyPremiereDate->toDateString());
+        if ($hasEarlyPremiere && $selectedCinemaId) {
+            $hasEarlyShowInCinema = Show::where('movie_id', $movie->movie_id)
+                ->where('cinema_id', $selectedCinemaId)
+                ->whereDate('show_date', $earlyPremiereDate)
+                ->where('remaining_seats', '>', 0)
+                ->whereRaw("CONCAT(show_date, ' ', start_time) > ?", [$now])
+                ->exists();
+            
+            if (!$hasEarlyShowInCinema) {
+                $hasEarlyPremiere = false;
             }
         }
 
@@ -155,11 +142,20 @@ class MovieController extends Controller
         $movie = Movie::where('slug', $slug)->firstOrFail();
 
         $date = $request->filled('date')
-            ? Carbon::parse($request->date)
+            ? Carbon::parse($request->date)->startOfDay()
             : Carbon::today('Asia/Ho_Chi_Minh');
 
         $cinemaId = $request->filled('cinema') ? (int)$request->cinema : null;
         $now = Carbon::now('Asia/Ho_Chi_Minh');
+
+        // Lấy danh sách rạp có suất chiếu (cần cho tiêu đề trong partial)
+        $availableCinemas = Cinema::whereHas('shows', function ($q) use ($movie, $date, $now, $cinemaId) {
+            $q->where('movie_id', $movie->movie_id)
+              ->whereDate('show_date', $date)
+              ->where('remaining_seats', '>', 0)
+              ->whereRaw("CONCAT(show_date, ' ', start_time) > ?", [$now])
+              ->when($cinemaId, fn($qq) => $qq->where('cinema_id', $cinemaId));
+        })->orderBy('cinema_name')->get();
 
         $shows = Show::with(['cinema', 'room'])
             ->where('movie_id', $movie->movie_id)
@@ -171,6 +167,6 @@ class MovieController extends Controller
             ->get()
             ->groupBy('cinema_id');
 
-        return view('movie.partials.showtimes', compact('shows'));
+        return view('movie.partials.showtimes', compact('shows', 'availableCinemas'));
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -8,8 +9,13 @@ return new class extends Migration {
         Schema::create('reservations', function (Blueprint $table) {
             $table->char('booking_code', 50)->primary();
             $table->char('ticket_code', 20)->nullable()->unique();
+            
+            // Trả về như cũ: unsignedInteger để khớp với user_id trong users
             $table->unsignedInteger('user_id');
+            
+            // Nếu show_id trong bảng shows là binary(16), giữ nguyên
             $table->binary('show_id', 16);
+            
             $table->integer('total_amount')->unsigned()->comment('VNĐ');
             $table->string('status', 20)->default('pending');
             $table->string('payment_method', 50)->nullable();

@@ -49,6 +49,41 @@
     .progress-scrolled .step-circle-active { width: 3rem !important; height: 3rem !important; }
 
     #content-start { padding-top: calc(7rem + 1px); }
+
+    /* Thêm class active cho ngày và rạp */
+    .date-tab.active {
+        background: linear-gradient(to right, #fbbf24, #fb923c);
+        color: black;
+        transform: scale(1.05);
+        box-shadow: 0 10px 25px rgba(251, 146, 60, 0.4);
+        ring: 4px solid #fef08a;
+    }
+    .date-tab.early-active::after {
+        content: "SỚM";
+        position: absolute;
+        top: -12px;
+        right: -12px;
+        background: #dc2626;
+        color: white;
+        font-size: 0.65rem;
+        font-weight: black;
+        padding: 0.125rem 0.5rem;
+        border-radius: 9999px;
+        animation: pulse 2s infinite;
+    }
+
+    .cinema-filter-btn.active {
+        background: linear-gradient(to right, #fbbf24, #fb923c);
+        color: black;
+        box-shadow: 0 10px 25px rgba(251, 146, 60, 0.4);
+        ring: 4px solid #fef08a;
+    }
+    .cinema-filter-btn.all-active {
+        background: linear-gradient(to right, #9333ea, #ec4899);
+        color: white;
+        box-shadow: 0 10px 25px rgba(147, 51, 234, 0.4);
+        ring: 4px solid #c084fc;
+    }
 </style>
 
 {{-- Thanh tiến trình (Sticky) - chỉ hiển thị khi đang đặt vé --}}
@@ -157,7 +192,7 @@
                 <h3 class="text-white font-bold text-3xl mb-6 text-center md:text-left border-b-2 border-purple-500/50 pb-2 inline-block">Lọc theo rạp</h3>
                 <div class="flex flex-wrap gap-4 justify-center md:justify-start">
                     <a href="{{ route('movie.detail', $movie->slug) }}"
-                        class="cinema-filter-btn group relative px-8 py-4 rounded-full font-extrabold text-lg transition-all duration-300 transform hover:scale-[1.03] {{ is_null($selectedCinemaId) ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl shadow-purple-500/50 ring-4 ring-purple-400/70' : 'filter-inactive text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                        class="cinema-filter-btn group relative px-8 py-4 rounded-full font-extrabold text-lg transition-all duration-300 transform hover:scale-[1.03] {{ is_null($selectedCinemaId) ? 'active all-active' : 'filter-inactive text-gray-300 hover:bg-white/10 hover:text-white' }}">
                             <span class="relative z-10 flex items-center gap-2">
                                 Tất cả rạp
                             </span>
@@ -165,7 +200,7 @@
 
                     @forelse($availableCinemas as $cinema)
                         <a href="{{ route('movie.detail', [$movie->slug, 'cinema' => $cinema->cinema_id]) }}"
-                        class="cinema-filter-btn group relative px-8 py-4 rounded-full font-extrabold text-lg transition-all duration-300 transform hover:scale-[1.03] {{ $selectedCinemaId == $cinema->cinema_id ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black shadow-2xl shadow-yellow-500/50 ring-4 ring-yellow-300/80' : 'filter-inactive text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                        class="cinema-filter-btn group relative px-8 py-4 rounded-full font-extrabold text-lg transition-all duration-300 transform hover:scale-[1.03] {{ $selectedCinemaId == $cinema->cinema_id ? 'active' : 'filter-inactive text-gray-300 hover:bg-white/10 hover:text-white' }}">
                             <span class="relative z-10">{{ $cinema->cinema_name }}</span>
                         </a>
                     @empty
@@ -199,11 +234,12 @@
                             $isEarly = $earlyDate && $d->toDateString() === $earlyDate->toDateString();
                         @endphp
                         <a href="{{ url()->current() }}?date={{ $d->format('Y-m-d') }}{{ $selectedCinemaId ? '&cinema=' . $selectedCinemaId : '' }}"
-                        class="date-tab relative w-[100px] h-[110px] flex flex-col justify-center items-center rounded-2xl font-bold text-center transition-all duration-300 transform {{ $isActive ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black scale-105 shadow-xl shadow-yellow-500/50 ring-4 ring-yellow-300' : 'filter-inactive text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                           data-date="{{ $d->format('Y-m-d') }}"
+                           class="date-tab relative w-[100px] h-[110px] flex flex-col justify-center items-center rounded-2xl font-bold text-center transition-all duration-300 transform filter-inactive text-gray-300 hover:bg-white/10 hover:text-white {{ $isActive ? 'active' : '' }} {{ $isActive && $isEarly ? 'early-active' : '' }}">
                             <div class="text-4xl font-black">{{ $d->format('d') }}</div>
-                            <div class="text-sm uppercase font-extrabold mt-1 {{ $isActive ? 'text-gray-900' : 'text-gray-200' }}">{{ $d->translatedFormat('D') }}</div>
-                            <div class="text-xs mt-0.5 {{ $isActive ? 'text-gray-700' : 'text-gray-400' }}">{{ $d->translatedFormat('M, Y') }}</div>
-                            @if($isEarly)
+                            <div class="text-sm uppercase font-extrabold mt-1">{{ $d->translatedFormat('D') }}</div>
+                            <div class="text-xs mt-0.5">{{ $d->translatedFormat('M, Y') }}</div>
+                            @if($isEarly && !$isActive)
                                 <span class="absolute -top-3 -right-3 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full font-black animate-pulse shadow-lg z-10">SỚM</span>
                             @endif
                         </a>
@@ -213,57 +249,14 @@
         </div>
     </div>
 
-    {{-- ✅ THÊM ATTRIBUTE data-shows-container TẠI ĐÂY --}}
+    {{-- Container suất chiếu --}}
     <div class="py-16 bg-gradient-to-br from-slate-800 to-black px-4" data-shows-container>
         <div class="max-w-6xl mx-auto">
             <h2 class="text-4xl font-heading font-black text-center text-white mb-12">
                 {{ $selectedCinemaId ? 'Suất chiếu - ' . ($availableCinemas->firstWhere('cinema_id', $selectedCinemaId)->cinema_name ?? '') : 'Suất chiếu tất cả rạp' }}
             </h2>
 
-            @forelse($shows as $cinemaId => $showGroup)
-                @php $cinema = $showGroup->first()->cinema @endphp
-                <div class="mb-12">
-                    <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-t-3xl p-6 md:p-8">
-                        <h3 class="text-2xl md:text-3xl font-heading font-extrabold text-white">{{ $cinema->cinema_name }}</h3>
-                        <p class="mt-2 text-purple-100 text-sm opacity-90">{{ $cinema->address }}</p>
-                    </div>
-                    <div class="bg-slate-700/50 backdrop-blur-sm rounded-b-3xl p-8">
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                            @foreach($showGroup as $show)
-                                @php $startTime = \Carbon\Carbon::parse($show->start_time); @endphp
-
-                                @auth
-                                    <a href="{{ route('seat.selection', $show->show_id) }}"
-                                    class="group/show relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 p-4 text-white text-center shadow-lg transform transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-purple-500/60">
-                                        <div class="text-3xl md:text-4xl font-black tracking-tight">{{ $startTime->format('H:i') }}</div>
-                                        <div class="mt-3 space-y-2">
-                                            <p class="text-xs md:text-sm font-bold opacity-95 truncate">{{ $show->room->room_name ?? 'Phòng' }}</p>
-                                            <p class="text-xs bg-white/25 px-3 py-1.5 rounded-full inline-block font-semibold">{{ $show->remaining_seats }} ghế</p>
-                                        </div>
-                                        <div class="absolute inset-0 bg-white opacity-0 group-hover/show:opacity-10 transition-opacity duration-500 pointer-events-none rounded-2xl"></div>
-                                    </a>
-                                @else
-                                    <a href="{{ route('login') }}?redirect={{ url()->current() }}"
-                                    class="relative overflow-hidden rounded-2xl bg-gray-50 border-3 border-dashed border-gray-300 p-4 text-center text-gray-600 font-bold hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 flex flex-col justify-center items-center min-h-[140px]">
-                                        <div class="text-3xl md:text-4xl font-black">{{ $startTime->format('H:i') }}</div>
-                                        <div class="mt-3 text-xs md:text-sm">Đăng nhập</div>
-                                    </a>
-                                @endauth
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-            @empty
-                <div class="text-center py-24">
-                    <div class="inline-block bg-white/10 backdrop-blur-xl rounded-3xl px-16 py-16 border border-white/20">
-                        <svg class="w-20 h-20 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                        </svg>
-                        <p class="text-3xl md:text-4xl font-heading font-extrabold text-gray-300">Không có suất chiếu</p>
-                        <p class="text-gray-400 mt-3 text-lg">Chọn ngày hoặc rạp khác</p>
-                    </div>
-                </div>
-            @endforelse
+            @include('movie.partials.showtimes')
         </div>
     </div>
 
@@ -290,77 +283,104 @@
     </div>
 @endif
 
-{{-- ✅ JAVASCRIPT FIX CHỌN NGÀY --}}
+{{-- JAVASCRIPT - ĐÃ SỬA ĐỂ HOẠT ĐỘNG SAU AJAX --}}
 @if($hasUpcomingShows)
 <script>
-    const progressHeader = document.getElementById('progress-header');
-    if (progressHeader) {
-        window.addEventListener('scroll', () => {
-            progressHeader.classList.toggle('progress-scrolled', window.scrollY > 100);
-        });
-    }
-
-    // FIX AJAX: Load Shows khi chọn ngày
-    document.querySelectorAll('a.date-tab').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-
-            const url = new URL(this.href);
-            const date = url.searchParams.get('date');
-            const cinema = url.searchParams.get('cinema');
-
-            loadShowsAjax(date, cinema);
-            window.history.pushState({}, '', this.href);
-        });
-    });
-
-    // FIX AJAX: Load Shows khi chọn rạp
-    document.querySelectorAll('a.cinema-filter-btn').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-
-            const url = new URL(this.href);
-            const cinema = url.searchParams.get('cinema');
-            
-            // Lấy ngày hiện tại từ URL hoặc ngày đầu tiên
-            const currentDate = new URL(window.location).searchParams.get('date') || 
-                              document.querySelector('a.date-tab')?.href.split('date=')[1]?.split('&')[0];
-
-            loadShowsAjax(currentDate, cinema);
-            
-            // Cập nhật URL
-            const newUrl = this.href;
-            window.history.pushState({}, '', newUrl);
-        });
-    });
-
-    function loadShowsAjax(date, cinema = null) {
-        const slug = '{{ $movie->slug }}';
-        let ajaxUrl = `/phim/${slug}/suat-chieu?date=${date}`;
-        if (cinema) ajaxUrl += `&cinema=${cinema}`;
-
-        const container = document.querySelector('[data-shows-container]');
-        if (!container) {
-            console.error('Container not found');
-            return;
+    document.addEventListener('DOMContentLoaded', function () {
+        const progressHeader = document.getElementById('progress-header');
+        if (progressHeader) {
+            window.addEventListener('scroll', () => {
+                progressHeader.classList.toggle('progress-scrolled', window.scrollY > 100);
+            });
         }
 
-        // Thêm loading state
-        container.innerHTML = '<div class="text-center py-20"><p class="text-white text-2xl">Đang tải...</p></div>';
-
-        fetch(ajaxUrl)
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return response.text();
-            })
-            .then(html => {
-                container.innerHTML = html;
-            })
-            .catch(error => {
-                console.error('Lỗi:', error);
-                container.innerHTML = '<div class="text-center py-20"><p class="text-red-500 text-2xl">Lỗi tải dữ liệu</p></div>';
+        function updateActiveStates(date = null, cinema = null) {
+            // Update ngày
+            document.querySelectorAll('.date-tab').forEach(tab => {
+                tab.classList.remove('active', 'early-active');
+                if (date && tab.dataset.date === date) {
+                    tab.classList.add('active');
+                    if (tab.querySelector('span[style*="red"]') || tab.innerHTML.includes('SỚM')) {
+                        tab.classList.add('early-active');
+                    }
+                }
             });
-    }
+
+            // Update rạp
+            document.querySelectorAll('.cinema-filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'all-active');
+                const btnCinema = new URL(btn.href).searchParams.get('cinema');
+                if (!cinema && !btnCinema) {
+                    btn.classList.add('active', 'all-active');
+                } else if (btnCinema == cinema) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function loadShowsAjax(date, cinema = null) {
+            const slug = '{{ $movie->slug }}';
+            let ajaxUrl = `/phim/${slug}/suat-chieu`;
+            const params = new URLSearchParams();
+            if (date) params.append('date', date);
+            if (cinema) params.append('cinema', cinema);
+            if (params.toString()) ajaxUrl += '?' + params.toString();
+
+            const container = document.querySelector('[data-shows-container]');
+            if (!container) return;
+
+            container.innerHTML = '<div class="text-center py-20"><p class="text-white text-2xl">Đang tải...</p></div>';
+
+            fetch(ajaxUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return response.text();
+                })
+                .then(html => {
+                    container.innerHTML = html;
+                    updateActiveStates(date, cinema);
+                })
+                .catch(error => {
+                    console.error('Lỗi:', error);
+                    container.innerHTML = '<div class="text-center py-20"><p class="text-red-500 text-2xl">Lỗi tải dữ liệu</p></div>';
+                });
+        }
+
+        // Sự kiện click ngày
+        document.querySelectorAll('a.date-tab').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const date = this.dataset.date;
+                const cinema = new URLSearchParams(window.location.search).get('cinema');
+                loadShowsAjax(date, cinema);
+
+                const newUrl = new URL(window.location);
+                newUrl.searchParams.set('date', date);
+                if (!cinema) newUrl.searchParams.delete('cinema');
+                window.history.pushState({}, '', newUrl);
+            });
+        });
+
+        // Sự kiện click rạp
+        document.querySelectorAll('a.cinema-filter-btn').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const url = new URL(this.href);
+                const cinema = url.searchParams.get('cinema');
+                const date = new URLSearchParams(window.location.search).get('date') || 
+                              document.querySelector('a.date-tab')?.dataset.date;
+
+                loadShowsAjax(date, cinema);
+
+                window.history.pushState({}, '', this.href);
+            });
+        });
+
+        // Khởi tạo trạng thái active ban đầu
+        const currentDate = new URLSearchParams(window.location.search).get('date');
+        const currentCinema = new URLSearchParams(window.location.search).get('cinema');
+        updateActiveStates(currentDate, currentCinema);
+    });
 </script>
 @endif
 @endsection

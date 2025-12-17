@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
 use App\Mail\OtpMail;
 use Carbon\Carbon;
 
@@ -61,15 +62,24 @@ class RegisterController extends Controller
 
             Log::info('User created successfully', ['user_id' => $user->user_id, 'email' => $request->email]);
 
-            // Gửi mail OTP (đã test thành công với config của bạn)
-            Mail::to($request->email)->send(new OtpMail($otp, $request->full_name, 'register'));
-
-            Log::info('OTP mail sent successfully', ['email' => $request->email, 'otp' => $otp]);
+            // 🔥 FIX: Gửi mail ở BACKGROUND (không chờ)
+            // Dispatch job vào queue để không block request
+            dispatch(function () use ($request, $otp) {
+                try {
+                    Mail::to($request->email)->send(new OtpMail($otp, $request->full_name, 'register'));
+                    Log::info('OTP mail sent successfully', ['email' => $request->email]);
+                } catch (\Exception $e) {
+                    Log::error('OTP mail failed', [
+                        'email' => $request->email,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            })->onQueue('default')->delay(0);
 
             // Lưu email vào session
             $request->session()->put('email', $request->email);
 
-            // Redirect sang trang OTP
+            // 🔥 FIX: Redirect ngay (không chờ mail gửi xong)
             return redirect()->route('verify-otp.show')
                             ->with('success', 'Đăng ký thành công! Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư (bao gồm cả thư rác/spam).');
 

@@ -2,13 +2,13 @@
 
 namespace App\Mail;
 
-use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
 class OtpMail extends Mailable
 {
-    use Queueable, SerializesModels;
+    // 🔥 FIX: Xóa "use Queueable" để mail gửi SYNCHRONOUSLY
+    use SerializesModels;
 
     public $otp;
     public $name;

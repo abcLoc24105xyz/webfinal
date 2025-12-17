@@ -6,9 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
-use App\Mail\OtpMail;
 use Carbon\Carbon;
 
 class RegisterController extends Controller
@@ -47,7 +45,7 @@ class RegisterController extends Controller
 
             $otp = rand(100000, 999999);
 
-            // Tạo user mới
+            // 1️⃣ Tạo user
             $user = User::create([
                 'full_name'   => $request->full_name,
                 'email'       => $request->email,
@@ -59,41 +57,124 @@ class RegisterController extends Controller
                 'email_verified_at' => null,
             ]);
 
-            Log::info('User created successfully', ['user_id' => $user->user_id, 'email' => $request->email]);
+            Log::info('✅ User created', ['user_id' => $user->id, 'email' => $request->email]);
 
-            // 🔥 FIX: Gửi mail SYNCHRONOUSLY (không queue)
-            try {
-                Mail::to($request->email)->send(new OtpMail($otp, $request->full_name, 'register'));
-                Log::info('OTP mail sent successfully', ['email' => $request->email, 'otp' => $otp]);
-            } catch (\Exception $mailError) {
-                Log::warning('OTP mail failed - but continuing', [
-                    'email' => $request->email,
-                    'error' => $mailError->getMessage(),
-                ]);
-                // Không throw - user vẫn có thể nhấn "Gửi lại"
-            }
-
-            // Lưu email vào session
+            // 2️⃣ Lưu session
             $request->session()->put('email', $request->email);
 
-            // 🔥 FIX: Redirect ngay sang verify-otp
+            // 3️⃣ 🔥 Gửi mail ở BACKGROUND (không chặn response)
+            $this->sendOtpEmailAsync($request->email, $otp, $request->full_name);
+
+            // 4️⃣ REDIRECT NGAY (không chờ mail)
             return redirect()->route('verify-otp.show')
                             ->with('success', 'Đăng ký thành công! Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư (bao gồm cả thư rác/spam).');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
-            // Validation error - return back with errors
             return back()->withErrors($e->validator)->withInput($request->only('full_name', 'email', 'phone'));
 
         } catch (\Exception $e) {
-            Log::error('Registration failed', [
+            Log::error('❌ Registration error', [
                 'email' => $request->email ?? 'unknown',
                 'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
             ]);
 
-            return back()->with('error', 'Lỗi: ' . $e->getMessage())
+            return back()->with('error', 'Không thể hoàn tất đăng ký (lỗi hệ thống). Vui lòng thử lại sau.')
                         ->withInput($request->only('full_name', 'email', 'phone'));
         }
+    }
+
+    // 🔥 Gửi mail ở background - KHÔNG BLOCK request
+    private function sendOtpEmailAsync($email, $otp, $fullName)
+    {
+        register_shutdown_function(function () use ($email, $otp, $fullName) {
+            try {
+                // Tạo HTML email
+                $subject = 'Xác minh tài khoản GhienCine';
+                $htmlContent = $this->getOtpEmailHtml($otp, $fullName);
+
+                // 🔥 Gửi email thô (raw email)
+                $this->sendRawEmail($email, $subject, $htmlContent);
+
+                Log::info('✅ OTP email sent', ['email' => $email]);
+            } catch (\Exception $e) {
+                Log::error('⚠️ OTP email failed', [
+                    'email' => $email,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        });
+    }
+
+    // Gửi email raw (không dùng Mail facade)
+    private function sendRawEmail($to, $subject, $htmlContent)
+    {
+        $fromEmail = env('MAIL_FROM_ADDRESS', 'noreply@ghiencine.com');
+        $fromName = env('MAIL_FROM_NAME', 'Ghien Cine');
+
+        // Headers
+        $headers = "MIME-Version: 1.0\r\n";
+        $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+        $headers .= "From: {$fromName} <{$fromEmail}>\r\n";
+        $headers .= "Reply-To: {$fromEmail}\r\n";
+        $headers .= "X-Mailer: GhienCine OTP System\r\n";
+
+        // 🔥 Gửi mail bằng PHP mail() function
+        $result = mail($to, $subject, $htmlContent, $headers);
+
+        if (!$result) {
+            throw new \Exception('PHP mail() failed');
+        }
+    }
+
+    // HTML template cho OTP email
+    private function getOtpEmailHtml($otp, $fullName)
+    {
+        return <<<HTML
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác minh tài khoản - GhienCine</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 30px auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { text-align: center; padding: 30px 20px; background: linear-gradient(135deg, #a855f7, #ec4899); color: white; }
+        .header h2 { font-size: 28px; margin: 0; font-weight: bold; }
+        .content { padding: 30px; text-align: center; color: #333333; }
+        .otp-box { display: inline-block; background-color: #fef3c7; border: 2px solid #fcd34d; border-radius: 8px; padding: 15px 30px; margin: 25px 0; }
+        .otp { font-size: 36px; font-weight: 900; color: #d97706; letter-spacing: 5px; margin: 0; }
+        .footer { text-align: center; padding: 15px; font-size: 11px; color: #888; background-color: #f9f9f9; border-top: 1px solid #eeeeee; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>GhienCine</h2>
+        </div>
+        <div class="content">
+            <h3 style="font-size: 20px; color: #444; margin-top: 0;">
+                Xin chào {$fullName},
+            </h3>
+            <p style="font-size: 16px; line-height: 1.6;">
+                Cảm ơn bạn đã đăng ký tài khoản! Vui lòng sử dụng mã xác minh (OTP) dưới đây để kích hoạt tài khoản:
+            </p>
+            <div class="otp-box">
+                <span class="otp">{$otp}</span>
+            </div>
+            <p style="font-size: 15px; line-height: 1.5; color: #555;">
+                Vui lòng nhập mã này trong vòng <strong>5 phút</strong> để hoàn tất.
+            </p>
+            <p style="font-size: 14px; line-height: 1.5; color: #777; margin-top: 30px;">
+                Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email.
+            </p>
+        </div>
+        <div class="footer">
+            <p style="margin: 0;">&copy; 2025 GhienCine. Tất cả các quyền được bảo lưu.</p>
+        </div>
+    </div>
+</body>
+</html>
+HTML;
     }
 }

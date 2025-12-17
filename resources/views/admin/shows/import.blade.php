@@ -137,7 +137,7 @@
                             </tr>
                             <tr>
                                 <td class="px-4 py-3">Bí Mật Của Gió</td>
-                                <td class="px-4 py-3">Rạp phim Landmark 81/td>
+                                <td class="px-4 py-3">Rạp phim Landmark 81</td>
                                 <td class="px-4 py-3">R201</td>
                                 <td class="px-4 py-3">15/12/2025</td>
                                 <td class="px-4 py-3">14:00</td>

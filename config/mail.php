@@ -46,7 +46,11 @@ return [
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
             'timeout' => null,
+<<<<<<< HEAD
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'https://ghiencine.onrender.com'), PHP_URL_HOST)),
+=======
+            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+>>>>>>> 3a03ec3 (final)
         ],
 
         'ses' => [

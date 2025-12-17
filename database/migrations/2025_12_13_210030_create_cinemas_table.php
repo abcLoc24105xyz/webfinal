@@ -6,7 +6,11 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void {
         Schema::create('cinemas', function (Blueprint $table) {
+<<<<<<< HEAD
             $table->unsignedSmallInteger('cinema_id')->primary();
+=======
+            $table->smallInteger('cinema_id')->primary();
+>>>>>>> 3a03ec3 (final)
             $table->string('cinema_name', 150);
             $table->string('address', 255);
             $table->string('phone', 15)->nullable();
@@ -19,4 +23,8 @@ return new class extends Migration {
     public function down(): void {
         Schema::dropIfExists('cinemas');
     }
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> 3a03ec3 (final)

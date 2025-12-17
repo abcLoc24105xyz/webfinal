@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<<<<<<< HEAD
 <phpunit xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+=======
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>>>>>>> 3a03ec3 (final)
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"

@@ -8,7 +8,10 @@ use App\Models\Seat;
 use App\Models\Reservation;
 use App\Models\ReservationSeat;
 use App\Models\Combo;
+<<<<<<< HEAD
 use App\Helper\VerifyRecaptcha;
+=======
+>>>>>>> 3a03ec3 (final)
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -42,7 +45,11 @@ class SeatController extends Controller
             // Nếu lỗi parse, bỏ qua check
         }
 
+<<<<<<< HEAD
         // LẤY GHẾ ĐANG BỊ GIỮ (CÒN HẠN 15 PHÚT)
+=======
+        // LẤY GHẾ ĐANG BỊ GIỮ (CÒN HẠN 10 PHÚT)
+>>>>>>> 3a03ec3 (final)
         $heldSeats = SeatHold::where('show_id', $show_id)
             ->where('expires_at', '>', now())
             ->pluck('seat_id');
@@ -64,6 +71,7 @@ class SeatController extends Controller
 
     public function holdSeats(Request $request, $show_id)
     {
+<<<<<<< HEAD
         // ✅ VERIFY RECAPTCHA
         // if (!verifyRecaptcha($request->input('g-recaptcha-response'))) {
         //     return response()->json([
@@ -76,11 +84,25 @@ class SeatController extends Controller
         $request->validate([
             'seats' => 'required|array|min:1|max:8',
             'seats.*' => 'required|exists:seats,seat_id',
+=======
+        
+        if (!verifyRecaptcha($request->input('g-recaptcha-response'))) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Xác minh thất bại. Vui lòng thử lại!'
+            ], 429);
+        }
+
+        $request->validate([
+            'seats' => 'required|array|min:1',
+            'seats.*' => 'exists:seats,seat_id',
+>>>>>>> 3a03ec3 (final)
         ]);
 
         $show = Show::findOrFail($show_id);
         $userId = Auth::check() ? Auth::id() : null;
 
+<<<<<<< HEAD
         if (!$userId) {
             return response()->json([
                 'success' => false,
@@ -107,6 +129,18 @@ class SeatController extends Controller
         $seatDetails = [];
 
         // ✅ KIỂM TRA VÀ GIỮ TỪNG GHẾ
+=======
+        // XÓA GIỮ GHẾ CŨ CỦA USER NÀY
+        SeatHold::where('show_id', $show_id)
+            ->when($userId, fn($q) => $q->where('user_id', $userId), fn($q) => $q->whereNull('user_id'))
+            ->delete();
+
+        $requestedSeats = Seat::whereIn('seat_id', $request->seats)->get()->keyBy('seat_id');
+
+        $total = 0;
+        $seatDetails = [];
+
+>>>>>>> 3a03ec3 (final)
         foreach ($request->seats as $seatId) {
             $seat = $requestedSeats->get($seatId);
             if (!$seat) {
@@ -133,7 +167,11 @@ class SeatController extends Controller
                 ], 409);
             }
 
+<<<<<<< HEAD
             // ✅ GIỮ GHẾ THÀNH CÔNG
+=======
+            // GIỮ GHẾ THÀNH CÔNG
+>>>>>>> 3a03ec3 (final)
             SeatHold::create([
                 'show_id'    => $show_id,
                 'seat_id'    => $seatId,
@@ -159,7 +197,11 @@ class SeatController extends Controller
             ];
         }
 
+<<<<<<< HEAD
         // ✅ LƯU VÀO SESSION – ĐẦY ĐỦ THÔNG TIN
+=======
+        // LƯU VÀO SESSION – ĐẦY ĐỦ THÔNG TIN
+>>>>>>> 3a03ec3 (final)
         session([
             'booking' => [
                 'show_id'     => $show_id,
@@ -170,7 +212,12 @@ class SeatController extends Controller
             ]
         ]);
 
+<<<<<<< HEAD
         // ✅ TRẢ RESPONSE THÀNH CÔNG
+=======
+        // ✅ FIX: CHỈ TRẢ SUCCESS = TRUE, KHÔNG REDIRECT NGAY
+        // JavaScript sẽ handle notification thay vì redirect
+>>>>>>> 3a03ec3 (final)
         return response()->json([
             'success' => true,
             'total'   => number_format($total) . 'đ',

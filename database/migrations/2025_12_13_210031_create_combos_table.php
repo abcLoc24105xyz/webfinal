@@ -6,7 +6,11 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void {
         Schema::create('combos', function (Blueprint $table) {
+<<<<<<< HEAD
             $table->unsignedTinyInteger('combo_id')->primary();
+=======
+            $table->tinyInteger('combo_id')->primary();
+>>>>>>> 3a03ec3 (final)
             $table->string('combo_name', 150)->unique('uq_combo_name');
             $table->string('description', 500)->nullable();
             $table->integer('price')->unsigned()->comment('VNĐ');
@@ -18,4 +22,8 @@ return new class extends Migration {
     public function down(): void {
         Schema::dropIfExists('combos');
     }
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> 3a03ec3 (final)

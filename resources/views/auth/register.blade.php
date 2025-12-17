@@ -10,7 +10,11 @@
             <p class="text-gray-600 mt-3">Chỉ mất 30 giây để tham gia cộng đồng GhienCine</p>
         </div>
 
+<<<<<<< HEAD
         {{-- Hiển thị thông báo thành công / lỗi --}}
+=======
+        {{-- ✅ FIX: Display success/error messages --}}
+>>>>>>> 3a03ec3 (final)
         @if(session('success'))
             <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg text-center font-medium animate-pulse">
                 <strong>✓ Thành công!</strong><br>
@@ -25,8 +29,14 @@
             </div>
         @endif
 
+<<<<<<< HEAD
         <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700">
             <strong>Yêu cầu mật khẩu:</strong>
+=======
+        {{-- ✅ FIX: Password strength indicator --}}
+        <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700">
+            <strong>📋 Yêu cầu mật khẩu:</strong>
+>>>>>>> 3a03ec3 (final)
             <ul class="mt-2 space-y-1 text-xs">
                 <li>✓ Tối thiểu 8 ký tự</li>
                 <li>✓ Chứa chữ hoa (A-Z)</li>
@@ -36,6 +46,7 @@
             </ul>
         </div>
 
+<<<<<<< HEAD
         <form action="{{ route('register') }}" method="POST" id="registerForm">
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -75,34 +86,132 @@
             </div>
 
             {{-- Thông báo mật khẩu khớp / không khớp --}}
+=======
+        <form action="{{ route('register') }}" method="POST" novalidate id="registerForm">
+            @csrf
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {{-- Họ và tên --}}
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Họ và tên</label>
+                    <input type="text" 
+                           name="full_name" 
+                           value="{{ old('full_name') }}" 
+                           required
+                           class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition @error('full_name') border-red-500 @enderror">
+                    @error('full_name')
+                        <small class="text-red-600 text-xs block mt-1">{{ $message }}</small>
+                    @enderror
+                </div>
+
+                {{-- Email --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" 
+                           name="email" 
+                           value="{{ old('email') }}" 
+                           required
+                           class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition @error('email') border-red-500 @enderror">
+                    @error('email')
+                        <small class="text-red-600 text-xs block mt-1">{{ $message }}</small>
+                    @enderror
+                </div>
+
+                {{-- Số điện thoại --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
+                    <input type="tel" 
+                           name="phone" 
+                           value="{{ old('phone') }}" 
+                           placeholder="0901234567"
+                           inputmode="numeric"
+                           maxlength="10"
+                           required
+                           class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition @error('phone') border-red-500 @enderror">
+                    <small class="text-gray-500 text-xs block mt-1">Ví dụ: 0901234567</small>
+                    @error('phone')
+                        <small class="text-red-600 text-xs block mt-1">{{ $message }}</small>
+                    @enderror
+                </div>
+
+                {{-- Mật khẩu --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu</label>
+                    <input type="password" 
+                           name="password" 
+                           required
+                           id="passwordInput"
+                           class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition @error('password') border-red-500 @enderror">
+                    @error('password')
+                        <small class="text-red-600 text-xs block mt-1">{{ $message }}</small>
+                    @enderror
+                </div>
+
+                {{-- Xác nhận mật khẩu --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Xác nhận mật khẩu</label>
+                    <input type="password" 
+                           name="password_confirmation" 
+                           required
+                           id="passwordConfirmInput"
+                           class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition @error('password') border-red-500 @enderror">
+                    @error('password')
+                        <small class="text-red-600 text-xs block mt-1">{{ $message }}</small>
+                    @enderror
+                </div>
+            </div>
+
+            {{-- ✅ FIX: Password match indicator --}}
+>>>>>>> 3a03ec3 (final)
             <div id="passwordMatchIndicator" class="mt-4 p-3 bg-gray-100 rounded-lg text-sm hidden">
                 <span id="matchText" class="text-gray-600">Mật khẩu xác nhận không khớp</span>
             </div>
 
+<<<<<<< HEAD
             <button type="submit" id="submitBtn" class="w-full mt-8 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg py-4 rounded-xl hover:shadow-2xl transition">
+=======
+            <button type="submit"
+                    id="submitBtn"
+                    class="w-full mt-8 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg py-4 rounded-xl hover:shadow-2xl transform hover:-translate-y-1 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled>
+>>>>>>> 3a03ec3 (final)
                 Đăng ký ngay & nhận mã OTP
             </button>
         </form>
 
         <p class="text-center mt-6 text-gray-600">
+<<<<<<< HEAD
             Đã có tài khoản? <a href="{{ route('login') }}" class="text-purple-600 font-bold hover:underline">Đăng nhập</a>
+=======
+            Đã có tài khoản?
+            <a href="{{ route('login') }}" class="text-purple-600 font-bold hover:underline">Đăng nhập</a>
+>>>>>>> 3a03ec3 (final)
         </p>
     </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+<<<<<<< HEAD
         const form = document.getElementById('registerForm');
         const submitBtn = document.getElementById('submitBtn');
         const passwordInput = document.getElementById('passwordInput');
         const passwordConfirmInput = document.getElementById('passwordConfirmInput');
+=======
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordConfirmInput = document.getElementById('passwordConfirmInput');
+        const submitBtn = document.getElementById('submitBtn');
+>>>>>>> 3a03ec3 (final)
         const matchIndicator = document.getElementById('passwordMatchIndicator');
         const matchText = document.getElementById('matchText');
 
         function checkPasswordMatch() {
             if (passwordInput.value.length === 0 || passwordConfirmInput.value.length === 0) {
                 matchIndicator.classList.add('hidden');
+<<<<<<< HEAD
                 submitBtn.disabled = false;
+=======
+                submitBtn.disabled = true;
+>>>>>>> 3a03ec3 (final)
                 return;
             }
 
@@ -119,6 +228,7 @@
             }
         }
 
+<<<<<<< HEAD
         // Kiểm tra khi nhập
         passwordInput.addEventListener('input', checkPasswordMatch);
         passwordConfirmInput.addEventListener('input', checkPasswordMatch);
@@ -128,6 +238,10 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = 'Đang xử lý... <span class="animate-spin inline-block ml-2">⟳</span>';
         });
+=======
+        passwordInput.addEventListener('input', checkPasswordMatch);
+        passwordConfirmInput.addEventListener('input', checkPasswordMatch);
+>>>>>>> 3a03ec3 (final)
     });
 </script>
 @endsection

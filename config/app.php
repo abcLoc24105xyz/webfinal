@@ -52,7 +52,11 @@ return [
     |
     */
 
+<<<<<<< HEAD
     'url' => env('APP_URL', 'https://ghiencine.onrender.com'),
+=======
+    'url' => env('APP_URL', 'http://localhost'),
+>>>>>>> 3a03ec3 (final)
 
     /*
     |--------------------------------------------------------------------------

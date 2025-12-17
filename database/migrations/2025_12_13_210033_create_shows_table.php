@@ -7,8 +7,13 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('shows', function (Blueprint $table) {
             $table->binary('show_id', 16)->primary();
+<<<<<<< HEAD
             $table->unsignedSmallInteger('movie_id')->nullable();
             $table->unsignedSmallInteger('cinema_id');
+=======
+            $table->smallInteger('movie_id')->nullable();
+            $table->smallInteger('cinema_id');
+>>>>>>> 3a03ec3 (final)
             $table->char('room_code', 6);
             $table->date('show_date');
             $table->time('start_time');
@@ -20,9 +25,15 @@ return new class extends Migration {
             $table->index(['movie_id', 'show_date'], 'idx_movie_date');
             $table->index('show_date', 'idx_date');
             
+<<<<<<< HEAD
             $table->foreign('movie_id')->references('movie_id')->on('movies')->onDelete('set null')->onUpdate('cascade');
             $table->foreign('cinema_id')->references('cinema_id')->on('cinemas')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('room_code')->references('room_code')->on('rooms')->onDelete('cascade')->onUpdate('cascade');
+=======
+            $table->foreign('movie_id')->references('movie_id')->on('movies')->onDelete('setNull');
+            $table->foreign('cinema_id')->references('cinema_id')->on('cinemas')->onDelete('cascade');
+            $table->foreign('room_code')->references('room_code')->on('rooms')->onDelete('cascade');
+>>>>>>> 3a03ec3 (final)
         });
     }
 

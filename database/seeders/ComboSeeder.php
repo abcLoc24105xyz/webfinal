@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -64,5 +65,21 @@ class ComboSeeder extends Seeder {
                 'status' => 1,
             ],
         ]);
+=======
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class ComboSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        //
+>>>>>>> 3a03ec3 (final)
     }
 }

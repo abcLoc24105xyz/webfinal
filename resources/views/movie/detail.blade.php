@@ -8,6 +8,10 @@
     $releaseDate = $movie->release_date ? \Carbon\Carbon::parse($movie->release_date) : null;
     $isReleased = $releaseDate && $releaseDate->lte(now());
 
+<<<<<<< HEAD
+=======
+    // Kiểm tra có suất chiếu nào trong tương lai không
+>>>>>>> 3a03ec3 (final)
     $hasUpcomingShows = $availableDates->contains(function ($date) {
         return \Carbon\Carbon::parse($date)->gte(now()->startOfDay());
     });
@@ -48,6 +52,7 @@
     .progress-scrolled .step-circle-active { width: 3rem !important; height: 3rem !important; }
 
     #content-start { padding-top: calc(7rem + 1px); }
+<<<<<<< HEAD
 
     .date-tab.active {
         background: linear-gradient(to right, #fbbf24, #fb923c) !important;
@@ -85,6 +90,11 @@
 </style>
 
 {{-- Thanh tiến trình (Sticky) --}}
+=======
+</style>
+
+{{-- Thanh tiến trình (Sticky) - chỉ hiện khi đang đặt vé --}}
+>>>>>>> 3a03ec3 (final)
 @auth
 <div id="progress-header" class="fixed top-20 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-white/10 transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 py-3 md:py-4">
@@ -179,7 +189,13 @@
     </div>
 </div>
 
+<<<<<<< HEAD
 @if($hasUpcomingShows)
+=======
+{{-- CHỈ HIỆN PHẦN NÀY KHI CÓ SUẤT CHIẾU TRONG TƯƠNG LAI --}}
+@if($hasUpcomingShows)
+
+>>>>>>> 3a03ec3 (final)
     {{-- Bộ lọc --}}
     <div class="py-12 px-4 bg-slate-900/50 backdrop-blur-sm border-t border-b border-white/10">
         <div class="max-w-6xl mx-auto">
@@ -187,6 +203,7 @@
             <div class="mb-10">
                 <h3 class="text-white font-bold text-3xl mb-6 text-center md:text-left border-b-2 border-purple-500/50 pb-2 inline-block">Lọc theo rạp</h3>
                 <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+<<<<<<< HEAD
                     <a href="{{ route('movie.detail', $movie->slug) }}"
                        data-cinema=""
                        class="cinema-filter-btn group relative px-8 py-4 rounded-full font-extrabold text-lg transition-all duration-300 transform hover:scale-[1.03] filter-inactive text-gray-300 hover:bg-white/10 hover:text-white {{ is_null($selectedCinemaId) ? 'active all-active' : '' }}">
@@ -199,6 +216,22 @@
                            class="cinema-filter-btn group relative px-8 py-4 rounded-full font-extrabold text-lg transition-all duration-300 transform hover:scale-[1.03] filter-inactive text-gray-300 hover:bg-white/10 hover:text-white {{ $selectedCinemaId == $cinema->cinema_id ? 'active' : '' }}">
                             <span class="relative z-10">{{ $cinema->cinema_name }}</span>
                         </a>
+=======
+                    <button type="button" onclick="filterByCinema(null, '{{ $selectedDate->format('Y-m-d') }}')"
+                            class="cinema-filter-btn group relative px-8 py-4 rounded-full font-extrabold text-lg transition-all duration-300 transform hover:scale-[1.03] {{ is_null($selectedCinemaId) ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl shadow-purple-500/50 ring-4 ring-purple-400/70' : 'filter-inactive text-gray-300 hover:bg-white/10 hover:text-white' }}"
+                            data-cinema-id="">
+                        <span class="relative z-10 flex items-center gap-2">
+                            Tất cả rạp
+                        </span>
+                    </button>
+
+                    @forelse($availableCinemas as $cinema)
+                        <button type="button" onclick="filterByCinema({{ $cinema->cinema_id }}, '{{ $selectedDate->format('Y-m-d') }}')"
+                                class="cinema-filter-btn group relative px-8 py-4 rounded-full font-extrabold text-lg transition-all duration-300 transform hover:scale-[1.03] {{ $selectedCinemaId == $cinema->cinema_id ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black shadow-2xl shadow-yellow-500/50 ring-4 ring-yellow-300/80' : 'filter-inactive text-gray-300 hover:bg-white/10 hover:text-white' }}"
+                                data-cinema-id="{{ $cinema->cinema_id }}">
+                            <span class="relative z-10">{{ $cinema->cinema_name }}</span>
+                        </button>
+>>>>>>> 3a03ec3 (final)
                     @empty
                         <div class="text-gray-400 text-center w-full py-8 font-medium">Không có rạp nào đang chiếu phim này</div>
                     @endforelse
@@ -229,6 +262,7 @@
                             $isActive = $d->toDateString() === $selectedDate->toDateString();
                             $isEarly = $earlyDate && $d->toDateString() === $earlyDate->toDateString();
                         @endphp
+<<<<<<< HEAD
                         <a href="{{ url()->current() }}?date={{ $d->format('Y-m-d') }}{{ $selectedCinemaId ? '&cinema=' . $selectedCinemaId : '' }}"
                            data-date="{{ $d->format('Y-m-d') }}"
                            class="date-tab relative w-[100px] h-[110px] flex flex-col justify-center items-center rounded-2xl font-bold text-center transition-all duration-300 transform filter-inactive text-gray-300 hover:bg-white/10 hover:text-white {{ $isActive ? 'active' : '' }} {{ $isActive && $isEarly ? 'early-active' : '' }}">
@@ -239,12 +273,24 @@
                                 <span class="absolute -top-3 -right-3 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full font-black animate-pulse shadow-lg z-10">SỚM</span>
                             @endif
                         </a>
+=======
+                        <button type="button" data-date="{{ $d->format('Y-m-d') }}"
+                                class="date-tab relative w-[100px] h-[110px] flex flex-col justify-center items-center rounded-2xl font-bold text-center transition-all duration-300 transform {{ $isActive ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black scale-105 shadow-xl shadow-yellow-500/50 ring-4 ring-yellow-300' : 'filter-inactive text-gray-300 hover:bg-white/10 hover:text-white' }}">
+                            <div class="text-4xl font-black">{{ $d->format('d') }}</div>
+                            <div class="text-sm uppercase font-extrabold mt-1 {{ $isActive ? 'text-gray-900' : 'text-gray-200' }}">{{ $d->translatedFormat('D') }}</div>
+                            <div class="text-xs mt-0.5 {{ $isActive ? 'text-gray-700' : 'text-gray-400' }}">{{ $d->translatedFormat('M, Y') }}</div>
+                            @if($isEarly)
+                                <span class="absolute -top-3 -right-3 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full font-black animate-pulse shadow-lg z-10">SỚM</span>
+                            @endif
+                        </button>
+>>>>>>> 3a03ec3 (final)
                     @endforeach
                 </div>
             </div>
         </div>
     </div>
 
+<<<<<<< HEAD
     {{-- Container suất chiếu --}}
     <div class="py-16 bg-gradient-to-br from-slate-800 to-black px-4" data-shows-container>
         <div id="shows-content">
@@ -252,6 +298,65 @@
         </div>
     </div>
 @else
+=======
+    {{-- Danh sách suất chiếu --}}
+    <div class="py-16 bg-gradient-to-br from-slate-800 to-black px-4">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-4xl font-heading font-black text-center text-white mb-10">
+                {{ $selectedCinemaId ? 'Suất chiếu - ' . ($availableCinemas->firstWhere('cinema_id', $selectedCinemaId)->cinema_name ?? '') : 'Suất chiếu tất cả rạp' }}
+            </h2>
+
+            <div id="showtimes-container" class="space-y-8">
+                @forelse($shows as $cinemaId => $showGroup)
+                    @php $cinema = $showGroup->first()->cinema @endphp
+                    <div class="group bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-500">
+                        <div class="bg-gradient-to-r from-purple-600 to-pink-600 p-5 md:p-6">
+                            <h3 class="text-2xl font-heading font-extrabold text-white">{{ $cinema->cinema_name }}</h3>
+                            <p class="mt-1 text-purple-100 text-sm opacity-90">{{ $cinema->address }}</p>
+                        </div>
+                        <div class="p-6 md:p-8">
+                            <div class="flex flex-wrap gap-4 justify-center lg:justify-start">
+                                @foreach($showGroup as $show)
+                                    @php $startTime = \Carbon\Carbon::parse($show->start_time); @endphp
+
+                                    @auth
+                                        <a href="{{ route('seat.selection', $show->show_id) }}"
+                                           class="group/show relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 p-4 text-white text-center shadow-lg w-[140px] md:w-[150px] transform transition-all duration-300 hover:scale-[1.05] hover:shadow-purple-500/40">
+                                            <div class="text-3xl font-black tracking-tight">{{ $startTime->format('H:i') }}</div>
+                                            <div class="mt-2 space-y-1">
+                                                <p class="text-sm font-semibold opacity-90 truncate">{{ $show->room->room_name ?? 'Phòng thường' }}</p>
+                                                <p class="text-xs bg-white/20 px-3 py-1 rounded-full inline-block font-medium">Còn <strong>{{ $show->remaining_seats }}</strong> ghế</p>
+                                            </div>
+                                        </a>
+                                    @else
+                                        <button type="button"
+                                                onclick="window.location.href = '{{ route('seat.selection', $show->show_id) }}'"
+                                                class="group/show relative overflow-hidden rounded-xl bg-gray-50 border-2 border-dashed border-gray-300 p-4 text-center text-gray-500 font-bold text-lg w-[140px] md:w-[150px] h-[148px] hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 flex flex-col justify-center items-center cursor-pointer">
+                                            <svg class="w-12 h-12 mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                            </svg>
+                                            <span class="text-sm">Đăng nhập để đặt vé</span>
+                                        </button>
+                                    @endauth
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-20">
+                        <div class="inline-block bg-white/10 backdrop-blur-xl rounded-2xl px-12 py-10 border border-white/20">
+                            <p class="text-4xl font-black text-gray-400">Không có suất chiếu nào</p>
+                            <p class="text-xl text-gray-500 mt-4">Hãy chọn ngày hoặc rạp khác!</p>
+                        </div>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+
+@else
+    {{-- KHÔNG CÓ SUẤT CHIẾU TRONG TƯƠNG LAI → HIỆN THÔNG BÁO ĐẸP --}}
+>>>>>>> 3a03ec3 (final)
     <div class="py-32 bg-gradient-to-b from-slate-900 to-black px-4">
         <div class="max-w-4xl mx-auto text-center">
             <div class="inline-block bg-white/10 backdrop-blur-xl rounded-3xl px-16 py-20 border border-white/20 shadow-2xl">
@@ -259,7 +364,11 @@
                     <h2 class="text-5xl md:text-4xl font-black text-purple-400 mb-6">SẮP CHIẾU</h2>
                     <p class="text-2xl text-gray-300 mb-8">Phim sẽ chính thức khởi chiếu vào</p>
                     <p class="text-6xl font-black text-yellow-400">{{ $releaseDate?->translatedFormat('d/m/Y') ?? 'Chưa xác định' }}</p>
+<<<<<<< HEAD
                     <p class="text-xl text-gray-400 mt-8">Hãy theo dõi để đặt vé sớm nhất!</p>
+=======
+                    <p class="text-xl text-gray-400 mt-8">Hãy theo dõi để đặt vé sớm nhé!</p>
+>>>>>>> 3a03ec3 (final)
                 @else
                     <h2 class="text-5xl md:text-4xl font-black text-red-500 mb-6">HIỆN TẠI CHƯA CÓ SUẤT CHIẾU</h2>
                     <p class="text-2xl text-gray-300">Cảm ơn bạn đã quan tâm đến bộ phim này! Bạn có thể xem danh sách phim có suất chiếu bằng liên kết dưới đây</p>
@@ -273,6 +382,7 @@
     </div>
 @endif
 
+<<<<<<< HEAD
 @if($hasUpcomingShows)
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -362,6 +472,85 @@
         const initCinema = new URLSearchParams(window.location.search).get('cinema');
         updateActiveStates(initDate, initCinema);
     });
+=======
+{{-- JavaScript - chỉ chạy khi có suất chiếu --}}
+@if($hasUpcomingShows)
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    let currentDate = urlParams.get('date') || '{{ $selectedDate->format('Y-m-d') }}';
+    let currentCinemaId = urlParams.get('cinema') ? parseInt(urlParams.get('cinema')) : null;
+
+    function filterByCinema(cinemaId, date) {
+        currentCinemaId = cinemaId;
+        document.querySelectorAll('.cinema-filter-btn').forEach(btn => {
+            btn.classList.remove('bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'text-white', 'shadow-2xl', 'shadow-purple-500/50', 'ring-4', 'ring-purple-400/70',
+                                  'from-yellow-400', 'to-orange-500', 'text-black', 'shadow-yellow-500/50', 'ring-yellow-300/80');
+            btn.classList.add('filter-inactive', 'text-gray-300');
+        });
+
+        const selector = cinemaId === null ? '[data-cinema-id=""]' : `[data-cinema-id="${cinemaId}"]`;
+        const btn = document.querySelector('.cinema-filter-btn' + selector);
+        if (btn) {
+            btn.classList.remove('filter-inactive', 'text-gray-300');
+            if (cinemaId === null) {
+                btn.classList.add('bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'text-white', 'shadow-2xl', 'shadow-purple-500/50', 'ring-4', 'ring-purple-400/70');
+            } else {
+                btn.classList.add('bg-gradient-to-r', 'from-yellow-400', 'to-orange-500', 'text-black', 'shadow-2xl', 'shadow-yellow-500/50', 'ring-4', 'ring-yellow-300/80');
+            }
+        }
+        loadShowtimes(date, cinemaId);
+    }
+
+    function loadShowtimes(date, cinemaId) {
+        currentDate = date;
+        const container = document.getElementById('showtimes-container');
+        container.innerHTML = '<div class="text-center py-20"><svg class="animate-spin h-12 w-12 text-yellow-400 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><p class="text-xl text-gray-400 mt-4">Đang tải suất chiếu...</p></div>';
+
+        let url = `{{ route('movie.showtimes', $movie->slug) }}`;
+        const params = new URLSearchParams();
+        params.append('date', date);
+        if (cinemaId) params.append('cinema', cinemaId);
+
+        const cleanUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+        history.replaceState(null, '', cleanUrl);
+
+        fetch(url + '?' + params.toString())
+            .then(r => r.text())
+            .then(html => container.innerHTML = html);
+    }
+
+    document.querySelectorAll('.date-tab').forEach(tab => {
+        tab.addEventListener('click', function () {
+            document.querySelectorAll('.date-tab').forEach(t => {
+                t.classList.remove('bg-gradient-to-r', 'from-yellow-400', 'to-orange-500', 'text-black', 'scale-105', 'ring-4', 'ring-yellow-300', 'shadow-xl', 'shadow-yellow-500/50');
+                t.classList.add('filter-inactive', 'text-gray-300');
+            });
+            this.classList.remove('filter-inactive', 'text-gray-300');
+            this.classList.add('bg-gradient-to-r', 'from-yellow-400', 'to-orange-500', 'text-black', 'scale-105', 'ring-4', 'ring-yellow-300', 'shadow-xl', 'shadow-yellow-500/50');
+            loadShowtimes(this.dataset.date, currentCinemaId);
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const initDate = urlParams.get('date') || '{{ $selectedDate->format('Y-m-d') }}';
+        const initCinema = urlParams.get('cinema') ? parseInt(urlParams.get('cinema')) : null;
+        filterByCinema(initCinema, initDate);
+
+        document.querySelectorAll('.date-tab').forEach(t => {
+            if (t.dataset.date === initDate) {
+                t.classList.remove('filter-inactive', 'text-gray-300');
+                t.classList.add('bg-gradient-to-r', 'from-yellow-400', 'to-orange-500', 'text-black', 'scale-105', 'ring-4', 'ring-yellow-300', 'shadow-xl', 'shadow-yellow-500/50');
+            }
+        });
+    });
+
+    const progressHeader = document.getElementById('progress-header');
+    if (progressHeader) {
+        window.addEventListener('scroll', () => {
+            progressHeader.classList.toggle('progress-scrolled', window.scrollY > 100);
+        });
+    }
+>>>>>>> 3a03ec3 (final)
 </script>
 @endif
 @endsection

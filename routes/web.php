@@ -29,15 +29,23 @@ Route::middleware('guest')->group(function () {
     Route::post('/verify-otp', [App\Http\Controllers\Auth\VerifyOtpController::class, 'verify'])->name('verify-otp.verify');
     Route::post('/resend-otp', [App\Http\Controllers\Auth\VerifyOtpController::class, 'resend'])->name('resend-otp');
 
+    // Quên mật khẩu - Form nhập email
     Route::get('/password/reset', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])
         ->name('password.request');
+
+    // Gửi OTP
     Route::post('/password/email', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendOtp'])
         ->name('password.email');
-    Route::get('/password/reset/combined', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showCombinedForm'])
-        ->name('password.reset.combined');
+
+    // Form nhập OTP + mật khẩu mới (kết hợp)
+    Route::get('/password/combined', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showCombinedForm'])
+        ->name('password.combined');
+
+    // Xử lý đặt lại mật khẩu
     Route::post('/password/reset', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'processCombined'])
         ->name('password.reset');
 
+    // Đăng nhập Google
     Route::get('/auth/google', [App\Http\Controllers\Auth\GoogleController::class, 'redirect'])
         ->name('auth.google');
     Route::get('/auth/google/callback', [App\Http\Controllers\Auth\GoogleController::class, 'callback'])
@@ -60,7 +68,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dat-ve/{show_id}', [App\Http\Controllers\SeatController::class, 'index'])->name('seat.selection');
     Route::post('/dat-ve/{show_id}/hold', [App\Http\Controllers\SeatController::class, 'holdSeats'])->name('seat.hold');
     
-    // ✅ ROUTE MỚI: Kiểm tra thời gian giữ ghế
+    // Kiểm tra thời gian giữ ghế
     Route::post('/seat/check-lock-time', [App\Http\Controllers\PaymentController::class, 'checkSeatLockTime'])->name('seat.check-lock-time');
 
     Route::get('/combo-select', [App\Http\Controllers\SelectComboController::class, 'show'])->name('combo.select');
@@ -82,7 +90,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/momo/create', [App\Http\Controllers\PaymentController::class, 'createMomoPayment'])->name('momo.create');
     Route::post('/momo/atm', [App\Http\Controllers\PaymentController::class, 'createAtmPayment'])->name('momo.atm');
     
-    // ✅ ROUTE MỚI: Tiếp tục thanh toán
+    // Tiếp tục thanh toán
     Route::post('/momo/continue', [App\Http\Controllers\PaymentController::class, 'continueMomoPayment'])->name('momo.continue');
 });
 
@@ -90,7 +98,7 @@ Route::get('/momo/return', [App\Http\Controllers\PaymentController::class, 'momo
 Route::get('/momo/failed', [App\Http\Controllers\PaymentController::class, 'showPaymentFailed'])->name('payment.failed');
 Route::match(['get', 'post'], '/momo/ipn', [App\Http\Controllers\PaymentController::class, 'momoIpn'])->name('momo.ipn');
 
-// ✅ ROUTE: Hủy booking hết hạn (chạy từ cron hoặc manual)
+// Hủy booking hết hạn (cron hoặc manual)
 Route::post('/admin/cancel-expired-reservations', [App\Http\Controllers\PaymentController::class, 'cancelExpiredReservations'])->name('cancel-expired-reservations');
 
 // ==================== ADMIN PANEL ====================

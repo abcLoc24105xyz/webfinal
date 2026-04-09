@@ -162,14 +162,6 @@ class PaymentController extends Controller
 
             // Kiểm tra thời gian hết hạn
             $expiresAt = Carbon::parse($reservation->expires_at);
-            if ($expiresAt->isPast()) {
-                $this->releaseSeats($tempCode);
-                return response()->json([
-                    'success' => false,
-                    'expired' => true,
-                    'message' => 'Thời gian giữ ghế đã hết. Vui lòng chọn ghế lại.'
-                ]);
-            }
 
             // Proceed with payment
             return $this->processMomoPayment($tempCode, $reservation);

@@ -2,7 +2,7 @@ FROM php:8.2-fpm-alpine
 
 WORKDIR /app
 
-# Cài packages hệ thống
+# Cài packages hệ thống và thư viện cần để build PHP extensions
 RUN apk add --no-cache \
     nginx \
     nodejs \
@@ -10,6 +10,8 @@ RUN apk add --no-cache \
     curl \
     git \
     unzip \
+    bash \
+    icu-dev \
     oniguruma-dev \
     libpng-dev \
     libjpeg-turbo-dev \
@@ -18,45 +20,62 @@ RUN apk add --no-cache \
     libzip-dev \
     zlib-dev
 
-# Cài PHP extensions cần cho Laravel
+# Cài PHP extensions cần cho Laravel / MySQL / Vite-related packages
 RUN docker-php-ext-configure gd --with-jpeg --with-freetype --with-webp \
-    && docker-php-ext-install pdo pdo_mysql mbstring gd zip
+    && docker-php-ext-install \
+        pdo \
+        pdo_mysql \
+        mbstring \
+        gd \
+        zip \
+        bcmath \
+        exif \
+        intl
 
-# Cài Composer
+# Cài Composer từ image chính thức
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Copy file composer trước để tận dụng cache
+# Copy file composer trước để tận dụng cache Docker
 COPY composer.json composer.lock ./
-RUN composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader
+
+# Cài PHP dependencies, bỏ scripts để tránh lỗi artisan lúc chưa có .env/app key
+RUN composer install \
+    --no-interaction \
+    --prefer-dist \
+    --no-dev \
+    --optimize-autoloader \
+    --no-scripts
 
 # Copy file npm trước để tận dụng cache
 COPY package.json package-lock.json ./
+
+# Cài npm dependencies
 RUN npm ci
 
-# Copy source code
+# Copy toàn bộ source code
 COPY . .
 
 # Build frontend assets
 RUN npm run build
 
-# Tạo thư mục Laravel cần thiết
+# Tạo các thư mục cần cho Laravel
 RUN mkdir -p \
     storage/logs \
+    storage/framework/cache \
     storage/framework/sessions \
     storage/framework/views \
-    storage/framework/cache \
     bootstrap/cache
 
 # Phân quyền
 RUN chown -R www-data:www-data /app \
     && chmod -R 775 storage bootstrap/cache
 
-# Copy nginx config
+# Cấu hình nginx
+RUN mkdir -p /etc/nginx/http.d
+
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 
-# Tạo default server block
-RUN mkdir -p /etc/nginx/http.d \
-    && cat << 'EOF' > /etc/nginx/http.d/default.conf
+RUN cat <<'EOF' > /etc/nginx/http.d/default.conf
 server {
     listen 80;
     server_name _;
@@ -81,11 +100,19 @@ server {
 }
 EOF
 
-# Tạo script start
-RUN cat << 'EOF' > /start.sh
+# Script khởi động
+RUN cat <<'EOF' > /start.sh
 #!/bin/sh
+
+php artisan config:clear || true
+php artisan cache:clear || true
+php artisan view:clear || true
+php artisan route:clear || true
+
 php artisan config:cache || true
 php artisan route:cache || true
+php artisan view:cache || true
+
 php-fpm -D
 nginx -g "daemon off;"
 EOF

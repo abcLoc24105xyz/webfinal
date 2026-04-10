@@ -105,10 +105,13 @@ php artisan cache:clear || true
 php artisan route:clear || true
 php artisan view:clear || true
 
-sleep 15
+echo "Waiting for database..."
+sleep 20
 
-php artisan migrate --force || true
+echo "Running migrations..."
+php artisan migrate --force
 
+echo "Starting services..."
 php-fpm -D
 nginx -g "daemon off;"
 EOF

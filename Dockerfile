@@ -85,9 +85,15 @@ EOF
 
 RUN cat <<'EOF' > /start.sh
 #!/bin/sh
+
 php artisan config:clear || true
+php artisan cache:clear || true
 php artisan route:clear || true
 php artisan view:clear || true
+
+sleep 10
+
+php artisan migrate --force || true
 
 php-fpm -D
 nginx -g "daemon off;"

@@ -50,10 +50,12 @@ RUN mkdir -p \
     storage/framework/cache \
     storage/framework/sessions \
     storage/framework/views \
-    bootstrap/cache
-
-RUN chown -R www-data:www-data /app \
-    && chmod -R 775 storage bootstrap/cache
+    bootstrap/cache \
+    && touch storage/logs/laravel.log \
+    && chown -R www-data:www-data /app \
+    && chmod -R 775 storage bootstrap/cache \
+    && chmod -R 777 storage/logs \
+    && chmod 666 storage/logs/laravel.log
 
 RUN mkdir -p /etc/nginx/http.d
 COPY docker/nginx.conf /etc/nginx/nginx.conf
@@ -86,12 +88,24 @@ EOF
 RUN cat <<'EOF' > /start.sh
 #!/bin/sh
 
+mkdir -p /app/storage/logs
+mkdir -p /app/storage/framework/cache
+mkdir -p /app/storage/framework/sessions
+mkdir -p /app/storage/framework/views
+mkdir -p /app/bootstrap/cache
+
+touch /app/storage/logs/laravel.log
+
+chmod -R 775 /app/storage /app/bootstrap/cache || true
+chmod -R 777 /app/storage/logs || true
+chmod 666 /app/storage/logs/laravel.log || true
+
 php artisan config:clear || true
 php artisan cache:clear || true
 php artisan route:clear || true
 php artisan view:clear || true
 
-sleep 10
+sleep 15
 
 php artisan migrate --force || true
 

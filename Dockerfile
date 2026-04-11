@@ -111,6 +111,9 @@ sleep 20
 echo "Running migrations..."
 php artisan migrate --force
 
+echo "Running seeders..."
+php artisan db:seed --force
+
 echo "Starting services..."
 php-fpm -D
 nginx -g "daemon off;"

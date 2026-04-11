@@ -50,7 +50,9 @@ RUN mkdir -p \
     storage/framework/cache \
     storage/framework/sessions \
     storage/framework/views \
+    storage/app/public \
     bootstrap/cache \
+    public \
     && touch storage/logs/laravel.log \
     && chown -R www-data:www-data /app \
     && chmod -R 775 storage bootstrap/cache \
@@ -92,6 +94,7 @@ mkdir -p /app/storage/logs
 mkdir -p /app/storage/framework/cache
 mkdir -p /app/storage/framework/sessions
 mkdir -p /app/storage/framework/views
+mkdir -p /app/storage/app/public
 mkdir -p /app/bootstrap/cache
 
 touch /app/storage/logs/laravel.log
@@ -105,17 +108,20 @@ php artisan cache:clear || true
 php artisan route:clear || true
 php artisan view:clear || true
 
+echo "Creating storage link..."
+rm -rf /app/public/storage || true
+php artisan storage:link || true
+
+echo "Starting php-fpm..."
+php-fpm -D
+
 echo "Waiting for database..."
 sleep 20
 
-echo "Running migrations..."
-php artisan migrate --force
+echo "Resetting database and seeding..."
+php artisan migrate:fresh --seed --force
 
-echo "Running seeders..."
-php artisan db:seed --force
-
-echo "Starting services..."
-php-fpm -D
+echo "Starting nginx..."
 nginx -g "daemon off;"
 EOF
 

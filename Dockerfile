@@ -36,7 +36,7 @@ RUN apk add --no-cache \
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Cache dependencies first
-COPY composer.json composer.lock ./
+COPY composer.json /
 RUN composer install \
     --no-interaction \
     --prefer-dist \

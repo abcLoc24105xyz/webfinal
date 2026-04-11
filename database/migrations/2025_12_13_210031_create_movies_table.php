@@ -6,17 +6,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void {
         Schema::create('movies', function (Blueprint $table) {
-<<<<<<< HEAD
             $table->unsignedSmallInteger('movie_id')->primary();
             $table->string('title', 255);
             $table->string('slug', 200)->unique();
             $table->unsignedTinyInteger('cate_id')->nullable();
-=======
-            $table->smallInteger('movie_id')->primary();
-            $table->string('title', 255);
-            $table->string('slug', 200)->unique();
-            $table->tinyInteger('cate_id')->nullable();
->>>>>>> 3a03ec3 (final)
             $table->string('director', 150)->nullable();
             $table->smallInteger('duration')->comment('phút');
             $table->text('description')->nullable();
@@ -32,19 +25,11 @@ return new class extends Migration {
             $table->index('title', 'idx_title');
             $table->index('release_date', 'idx_release');
             $table->index('status', 'idx_status');
-<<<<<<< HEAD
             $table->foreign('cate_id')->references('cate_id')->on('categories')->onDelete('set null');
-=======
-            $table->foreign('cate_id')->references('cate_id')->on('categories')->onDelete('setNull');
->>>>>>> 3a03ec3 (final)
         });
     }
 
     public function down(): void {
         Schema::dropIfExists('movies');
     }
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> 3a03ec3 (final)

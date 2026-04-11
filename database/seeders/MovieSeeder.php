@@ -1,22 +1,13 @@
 <?php
-<<<<<<< HEAD
-
-=======
->>>>>>> 3a03ec3 (final)
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-<<<<<<< HEAD
 class MovieSeeder extends Seeder
 {
     public function run(): void
     {
-=======
-class MovieSeeder extends Seeder {
-    public function run(): void {
->>>>>>> 3a03ec3 (final)
         DB::table('movies')->insert([
             [
                 'movie_id' => 1,
@@ -25,11 +16,7 @@ class MovieSeeder extends Seeder {
                 'cate_id' => 1,
                 'director' => 'Lê Nhật Quang',
                 'duration' => 118,
-<<<<<<< HEAD
                 'description' => 'Tử Chiến Trên Không kể về Bình, chuyên viên cảnh vệ hàng không...',
-=======
-                'description' => 'Tử Chiến Trên Không kể về Bình, chuyên viên cảnh vệ hàng không, vô tình rơi vào cuộc đời đầu sinh tử khi chuyến bay anh đi bị nhóm không tặc do Long cầm đầu khống chế. Trong 15 phút sau khi cất cánh, máy bay trở thành chiến trường. Bình cùng phi hành đoàn và hành khách phải phối hợp chống trả, ngăn chặn âm mưu tấn công độc ác của bọn cướp, bảo vệ tính mạng mọi người giữa bầu trời không lối thoát.',
->>>>>>> 3a03ec3 (final)
                 'release_date' => '2025-09-19',
                 'early_premiere_date' => null,
                 'poster' => 'tu-chien-tren-khong.jpg',
@@ -46,11 +33,7 @@ class MovieSeeder extends Seeder {
                 'cate_id' => 5,
                 'director' => 'Mohammad Kheirandish',
                 'duration' => 96,
-<<<<<<< HEAD
                 'description' => 'Cậu bé cá heo và những người bạn đồng hành...',
-=======
-                'description' => 'Cậu bé cá heo và những người bạn động hành bắt đầu cuộc hành trình mới đầy nguy hiểm để giải cứu Majid khỏi nanh vuốt cá voi hoang dã. Cuộc hành trình đã vô tình khiến cậu bé cá heo phát hiện ra lẻ thuộc bí ẩn mà cha cậu phát minh và Majid đã biến thành sinh vật quái dị sau khi uống nó. Với sự giúp đỡ của mọi người, cậu bé cá heo đã đánh bại Majid thành công và mang bình yên trở lại cho dân làng và biển cả.',
->>>>>>> 3a03ec3 (final)
                 'release_date' => '2025-10-03',
                 'early_premiere_date' => null,
                 'poster' => 'cau-be-ca-heo-va-bi-mat-7-dai-duong.png',
@@ -62,7 +45,6 @@ class MovieSeeder extends Seeder {
             ],
             [
                 'movie_id' => 3,
-<<<<<<< HEAD
                 'title' => 'Bịt Mắt Bắt Nai',
                 'slug' => 'bit-mat-bat-nai-3',
                 'cate_id' => 4,
@@ -72,17 +54,6 @@ class MovieSeeder extends Seeder {
                 'release_date' => '2025-10-31',
                 'early_premiere_date' => null,
                 'poster' => 'bit-mat-bat-nai.png',
-=======
-                'title' => 'Bật Mặt Bắt Nai',
-                'slug' => 'bat-mat-bat-nai-3',
-                'cate_id' => 4,
-                'director' => 'Hoàng Thơ',
-                'duration' => 92,
-                'description' => 'Trang - một nhân viên bất động sản bị cưỡng bức. Cô lo sợ bạn trai Hiệp sẽ chia tay nên đã "dụ" anh đến một homestay để cầu hôn. Tại đây, cô hoảng loạn khi gặp Long - chủ homestay, người giống hệt kẻ đã hãm hại mình; bên cạnh đó Ngọc - vợ của Long cũng là nạn nhân của tên này. Khi Trang âm thầm tìm hiểu sự thật, thì mọi thứ cũng lại cũng phức tạp hơn và có một âm mưu đen tối đang chờ đợi tất cả bọn họ.',
-                'release_date' => '2025-10-31',
-                'early_premiere_date' => null,
-                'poster' => 'bat-mat-bat-nai.png',
->>>>>>> 3a03ec3 (final)
                 'trailer' => 'https://www.youtube.com/watch?v=ABdyHbWAPIQ',
                 'rating' => 45,
                 'age_limit' => 16,
@@ -91,20 +62,12 @@ class MovieSeeder extends Seeder {
             ],
             [
                 'movie_id' => 4,
-<<<<<<< HEAD
                 'title' => 'Cục Vàng Của Ngoại',
-=======
-                'title' => 'Cúc Vàng Của Ngoại',
->>>>>>> 3a03ec3 (final)
                 'slug' => 'cuc-vang-cua-ngoai-4',
                 'cate_id' => 2,
                 'director' => 'Khương Ngọc',
                 'duration' => 119,
-<<<<<<< HEAD
                 'description' => 'Lấy cảm hứng từ những ký ức tuổi thơ...',
-=======
-                'description' => 'Lấy cảm hứng từ những kỷ ức tuổi thơ ngọt ngào, "Cúc Vàng Của Ngoại" mang đến câu chuyện ấm áp về tình bà cháu trong một xóm nhỏ chan chứa nghĩa tình.',
->>>>>>> 3a03ec3 (final)
                 'release_date' => '2025-10-17',
                 'early_premiere_date' => null,
                 'poster' => 'cuc-vang-cua-ngoai.jpg',
@@ -116,7 +79,6 @@ class MovieSeeder extends Seeder {
             ],
             [
                 'movie_id' => 5,
-<<<<<<< HEAD
                 'title' => 'Cải Mả',
                 'slug' => 'cai-ma-5',
                 'cate_id' => 4,
@@ -126,17 +88,6 @@ class MovieSeeder extends Seeder {
                 'release_date' => '2025-10-31',
                 'early_premiere_date' => null,
                 'poster' => 'cai-ma.png',
-=======
-                'title' => 'Cải Mộ',
-                'slug' => 'cai-mo-5',
-                'cate_id' => 4,
-                'director' => 'Thắng Vũ',
-                'duration' => 115,
-                'description' => 'Khi đại gia đình ông Quang trở về quê để thực hiện nghi lễ cải táng đã bị trì hoãn quá lâu, họ không chỉ đối diện với những nghi thức tâm linh, mà còn vô tình khơi dậy vòng xoáy nghiệp báo truyền đời.',
-                'release_date' => '2025-10-31',
-                'early_premiere_date' => null,
-                'poster' => 'cai-mo.png',
->>>>>>> 3a03ec3 (final)
                 'trailer' => 'https://www.youtube.com/watch?v=b_0KRi-6xRg',
                 'rating' => 45,
                 'age_limit' => 16,
@@ -150,11 +101,7 @@ class MovieSeeder extends Seeder {
                 'cate_id' => 2,
                 'director' => 'Nguyễn Thanh Bình',
                 'duration' => 91,
-<<<<<<< HEAD
                 'description' => 'Bị giang hồ đe doạ...',
-=======
-                'description' => 'Bị giang hạ đe doạ, một người con trai đã làm đám ma giả cho mẹ mình để lừa tiền bảo hiểm. Nhưng kế hoạch bất hiểu điên rồ của anh liên tục bị phá đám bởi từ người lạ đến người quen, nhất là khi ngày anh đưa mẹ vào hòm lại tính cơ là ngày sinh nhật 60 tuổi của bà.',
->>>>>>> 3a03ec3 (final)
                 'release_date' => '2025-10-30',
                 'early_premiere_date' => null,
                 'poster' => 'pha-dam-sinh-nhat-me.jpg',
@@ -171,11 +118,7 @@ class MovieSeeder extends Seeder {
                 'cate_id' => 3,
                 'director' => 'Choosak Iamsook',
                 'duration' => 104,
-<<<<<<< HEAD
                 'description' => 'Lấy cảm hứng từ truyền thuyết Mae Nak...',
-=======
-                'description' => 'Lấy cảm hứng từ truyền thuyết dân gian Thái Lan về hồn ma Mae Nak, Tình Người Duyên Ma: Nhắm Mak Yêu Luôn kể câu chuyện tình vượt thời gian giữa nàng Nak và chàng Mak. Xuyên không đến 200 năm sau, Nak bắt ngờ được vào vai nữ chính trong chính bộ phim về truyền thuyết của mình. Tình cờ thay, vai nam chính lại được thủ bởi Mak - lúc này đã là một nam diễn viên nổi tiếng toàn quốc. Ở đây, Nak phải chinh phục lại trái tim Mak trong vòng 30 ngày mà không được dùng đến ma lực, để có thể ở bên anh trọn đời trọn kiếp.',
->>>>>>> 3a03ec3 (final)
                 'release_date' => '2025-11-07',
                 'early_premiere_date' => null,
                 'poster' => 'tinh-nguoi-duyen-ma-2025.png',
@@ -187,20 +130,12 @@ class MovieSeeder extends Seeder {
             ],
             [
                 'movie_id' => 8,
-<<<<<<< HEAD
                 'title' => 'Quỷ Tha Ma Bắt: Thai Chiêu Tài',
-=======
-                'title' => 'Quỷ Tha Ma Bắt: Thai Chiều Tài',
->>>>>>> 3a03ec3 (final)
                 'slug' => 'quy-tha-ma-bat-thai-chieu-tai-8',
                 'cate_id' => 4,
                 'director' => 'Trần Nhân Kiên',
                 'duration' => 104,
-<<<<<<< HEAD
                 'description' => 'Nhơn, một doanh nhân thành đạt...',
-=======
-                'description' => 'Nhơn, một doanh nhân thành đạt nhờ thủ đoạn và mưu mẹo, tìm đến thầu tả thuật mang tên "Thai Chiều Tài" để giữ lấy tài khí đã vô tình khơi dậy những ám ảnh từ quá khứ và sang chấn liên tiếp hệ.',
->>>>>>> 3a03ec3 (final)
                 'release_date' => '2025-11-07',
                 'early_premiere_date' => null,
                 'poster' => 'thai-chieu-tai.jpg',
@@ -217,11 +152,7 @@ class MovieSeeder extends Seeder {
                 'cate_id' => 3,
                 'director' => 'Dương Minh Chiến',
                 'duration' => 103,
-<<<<<<< HEAD
                 'description' => 'Báu vật làng biển Long Diên Hương...',
-=======
-                'description' => 'Báu vật làng biển Long Diên Hương bị đánh cắp, mở ra cuộc hành trình truy tìm đầy kịch tính. Không chỉ có võ thuật màn nhã, bộ phim còn mang đến tiếng cười, sự gắn kết và những giá trị nhân văn của con người làng chài.',
->>>>>>> 3a03ec3 (final)
                 'release_date' => '2025-11-14',
                 'early_premiere_date' => null,
                 'poster' => 'truy-tim-long-dien-huong.jpg',
@@ -238,11 +169,7 @@ class MovieSeeder extends Seeder {
                 'cate_id' => 5,
                 'director' => 'Isao Takahata',
                 'duration' => 89,
-<<<<<<< HEAD
                 'description' => 'Câu chuyện cảm động về tình anh em...',
-=======
-                'description' => 'Bộ phim được đặt trong bối cảnh giai đoạn cuối chiến tranh thế giới thứ 2 ở Nhật, kể về câu chuyện cảm động về tình anh em của hai đứa trẻ mẹ cơi là Seita và Setsuko. Hai anh em mất mẹ trong một trận bom dự dộ của không quân Mỹ khi cha của chúng đang chiến đấu cho Hải quân Nhật. Hai đứa bé phải vật lộn giữa nạn đói, giữa sự thế ơ của những người xung quanh...',
->>>>>>> 3a03ec3 (final)
                 'release_date' => '2025-11-07',
                 'early_premiere_date' => null,
                 'poster' => 'mo-dom-dom.png',
@@ -254,20 +181,12 @@ class MovieSeeder extends Seeder {
             ],
             [
                 'movie_id' => 11,
-<<<<<<< HEAD
                 'title' => 'Trái Tìm Què Quặt',
-=======
-                'title' => 'Trái Tim Quẻ Quặt',
->>>>>>> 3a03ec3 (final)
                 'slug' => 'trai-tim-que-quat-11',
                 'cate_id' => 1,
                 'director' => 'Nguyễn Quốc Công',
                 'duration' => 102,
-<<<<<<< HEAD
                 'description' => 'Một vụ án máu chấn động thị trấn...',
-=======
-                'description' => 'Một vụ án máu tán báo làm chấn động thị trấn yên bình...',
->>>>>>> 3a03ec3 (final)
                 'release_date' => '2025-11-07',
                 'early_premiere_date' => null,
                 'poster' => 'trai-tim-que-quat.jpg',
@@ -284,11 +203,7 @@ class MovieSeeder extends Seeder {
                 'cate_id' => 2,
                 'director' => 'Lê Nhật Quang (Leon Le)',
                 'duration' => 120,
-<<<<<<< HEAD
                 'description' => 'Câu chuyện đầy chiều sâu trong khu chung cư...',
-=======
-                'description' => 'Với sự năng đột của người chủ quyền lực, Khang được giao cho công việc dịch cuốn "Hoàng Tử Bé" và dọn vào căn hộ bề trông ở khu chung cư...',
->>>>>>> 3a03ec3 (final)
                 'release_date' => '2025-11-28',
                 'early_premiere_date' => null,
                 'poster' => 'quan-ky-nam.jpg',
@@ -300,20 +215,12 @@ class MovieSeeder extends Seeder {
             ],
             [
                 'movie_id' => 13,
-<<<<<<< HEAD
                 'title' => 'Bẫy Tiền',
-=======
-                'title' => 'Báy Tiên',
->>>>>>> 3a03ec3 (final)
                 'slug' => 'bay-tien-13',
                 'cate_id' => 1,
                 'director' => 'Oscar Dương',
                 'duration' => 120,
-<<<<<<< HEAD
                 'description' => 'Một vụ lừa đảo qua điện thoại...',
-=======
-                'description' => 'Khi một vụ lừa đảo qua điện thoại bắt ngờ ập đến, Đăng Thưởng chuyên gia tương chứng năm trong tay cuộc sống ổn định bằng bị cuốn vào vòng xoáy nguy hiểm giữa tiền bạc, tình thân và niềm tin...',
->>>>>>> 3a03ec3 (final)
                 'release_date' => '2025-11-22',
                 'early_premiere_date' => null,
                 'poster' => 'bay-tien.jpg',
@@ -325,7 +232,6 @@ class MovieSeeder extends Seeder {
             ],
             [
                 'movie_id' => 14,
-<<<<<<< HEAD
                 'title' => 'Cưới vợ cho cha',
                 'slug' => 'cuoi-vo-cho-cha-14',
                 'cate_id' => 2,
@@ -335,17 +241,6 @@ class MovieSeeder extends Seeder {
                 'release_date' => '2025-11-21',
                 'early_premiere_date' => null,
                 'poster' => 'cuoi-vo-cho-cha.png',
-=======
-                'title' => 'Cười Với Cho Cha',
-                'slug' => 'cuoi-voi-cho-cha-14',
-                'cate_id' => 2,
-                'director' => 'Nguyễn Ngọc Lâm',
-                'duration' => 112,
-                'description' => 'Tại một ngôi làng nhỏ yên bình ở miền Tây Việt Nam, ông Sáu Sớu - chủ quán karaoke cà phê - sống một mình và mong ngóng từng ngày đứa con trai Ứt Tùng trở về thăm nhà sau thời gian làm việc ở Sài Gòn...',
-                'release_date' => '2025-11-21',
-                'early_premiere_date' => null,
-                'poster' => 'cuoi-voi-cho-cha.png',
->>>>>>> 3a03ec3 (final)
                 'trailer' => 'https://www.youtube.com/watch?v=pXCRj4OMLg0',
                 'rating' => 41,
                 'age_limit' => 0,
@@ -359,17 +254,10 @@ class MovieSeeder extends Seeder {
                 'cate_id' => 5,
                 'director' => 'Jon M. Chu',
                 'duration' => 138,
-<<<<<<< HEAD
                 'description' => 'Chương cuối của câu chuyện Elphaba...',
                 'release_date' => '2025-11-21',
                 'early_premiere_date' => null,
                 'poster' => 'wicked_2.png',
-=======
-                'description' => 'Chương cuối cùng của câu chuyện bắt đầu khi Elphaba và Glinda đã xa cách, mỗi người đang sống với hậu quả từ những lựa chọn của riêng mình...',
-                'release_date' => '2025-11-21',
-                'early_premiere_date' => null,
-                'poster' => 'wikced_2.png',
->>>>>>> 3a03ec3 (final)
                 'trailer' => null,
                 'rating' => 42,
                 'age_limit' => 0,
@@ -378,20 +266,12 @@ class MovieSeeder extends Seeder {
             ],
             [
                 'movie_id' => 16,
-<<<<<<< HEAD
                 'title' => 'Thế Hệ Kỳ Tích (Bà Đừng Buồn Con)',
-=======
-                'title' => 'Thế Hệ Kỳ Tích (Bà Đủng Buồn Con)',
->>>>>>> 3a03ec3 (final)
                 'slug' => 'the-he-ky-tich-ba-dung-buon-con-16',
                 'cate_id' => 2,
                 'director' => 'Hoàng Nam',
                 'duration' => 120,
-<<<<<<< HEAD
                 'description' => 'Chàng sinh viên Tiến và giấc mơ...',
-=======
-                'description' => 'Chàng sinh viên Tiến mang trong mình giấc mơ tạo ra tựa game vương tầm thế giới...',
->>>>>>> 3a03ec3 (final)
                 'release_date' => '2025-12-12',
                 'early_premiere_date' => null,
                 'poster' => 'the-he-ky-tich.png',
@@ -403,20 +283,12 @@ class MovieSeeder extends Seeder {
             ],
             [
                 'movie_id' => 17,
-<<<<<<< HEAD
                 'title' => 'Ai Thương Ai Mến',
-=======
-                'title' => 'Ai Thương Ai Mện',
->>>>>>> 3a03ec3 (final)
                 'slug' => 'ai-thuong-ai-men-17',
                 'cate_id' => 2,
                 'director' => 'Thu Trang',
                 'duration' => 120,
-<<<<<<< HEAD
                 'description' => 'Bộ phim lấy bối cảnh miền Tây...',
-=======
-                'description' => 'Bộ phim lấy bối cảnh miền Tây sông nước năm 1960, kể về hành trình cuộc đời của Mện...',
->>>>>>> 3a03ec3 (final)
                 'release_date' => '2026-01-01',
                 'early_premiere_date' => null,
                 'poster' => 'ai-thuong-ai-men.jpg',
@@ -433,11 +305,7 @@ class MovieSeeder extends Seeder {
                 'cate_id' => 4,
                 'director' => 'Trần Hữu Tấn',
                 'duration' => 120,
-<<<<<<< HEAD
                 'description' => 'Hoàng tử được sinh ra nhờ tà thuật...',
-=======
-                'description' => 'Hoàng Tử Quỷ xoay quanh Thần Đức - một hoàng tử được sinh ra nhờ tả thuật...',
->>>>>>> 3a03ec3 (final)
                 'release_date' => '2025-12-05',
                 'early_premiere_date' => null,
                 'poster' => 'hoang-tu-quy.png',
@@ -447,77 +315,6 @@ class MovieSeeder extends Seeder {
                 'status' => 2,
                 'created_at' => '2025-11-01',
             ],
-<<<<<<< HEAD
-=======
-            [
-                'movie_id' => 24,
-                'title' => 'Quái Thú Vô Hình: Vùng Đất Chết Chóc',
-                'slug' => 'quai-thu-vo-hinh-vung-dat-chet-choc-24',
-                'cate_id' => 1,
-                'director' => 'Joshua Watkins, Dan Trachtenberg, Richard Cowan',
-                'duration' => 110,
-                'description' => 'Quái Thú Vô Hình: Vùng Đất Chết Chóc với sự tham gia của Elle Fanning và Dimitrius Schuster-Koloamatangi, được đặt trong bối cảnh tương lai trên một hành tinh xa xôi, nơi một Predator trẻ tuổi (Schuster-Koloamatangi), bị dòng tộc của mình xa lánh, và sau đó tìm thấy một đồng minh không ngờ là Thia (Fanning) và bắt đầu một hành trình đầy nguy hiểm để tìm kiếm kẻ thù mạnh nhất. Bộ phim do Dan Trachtenberg đạo diễn và được sản xuất bởi John Davis, Dan Trachtenberg, Marc Toberoff, Ben Rosenblatt, Brent O\'Connor.',
-                'release_date' => '2026-01-15',
-                'early_premiere_date' => '2026-01-01',
-                'poster' => 'quai-thu-vo-hinh.jpg',
-                'trailer' => 'https://www.youtube.com/watch?v=AzBi73ddou4',
-                'rating' => null,
-                'age_limit' => 16,
-                'status' => 1,
-                'created_at' => '2025-12-10',
-            ],
-            [
-                'movie_id' => 25,
-                'title' => 'Mùi Phở',
-                'slug' => 'mui-pho-25',
-                'cate_id' => 3,
-                'director' => 'Minh Beta',
-                'duration' => 106,
-                'description' => 'Câu chuyện về sự xung đột thế hệ và những va chạm giữa quan niệm cũ và lối sống hiện đại, xoay quanh món Phở - biểu tượng ẩm thực Việt. Đằng sau những mâu thuẫn và tranh cãi ấy, tầng bí mật dần được hé lộ, mở ra hành trình tìm lại sự ấm áp của tình thân qua những tình tiết hài hước, dí dỏm và đầy duyên dáng.',
-                'release_date' => '2026-02-17',
-                'early_premiere_date' => null,
-                'poster' => 'mui-pho.png',
-                'trailer' => 'https://www.youtube.com/watch?v=3ZlouKbVets',
-                'rating' => null,
-                'age_limit' => 0,
-                'status' => 1,
-                'created_at' => '2025-12-11',
-            ],
-            [
-                'movie_id' => 26,
-                'title' => 'Avatar: Lửa Và Tro Tàn',
-                'slug' => 'avatar-lua-va-tro-tan-26',
-                'cate_id' => 6,
-                'director' => 'James Cameron',
-                'duration' => 197,
-                'description' => 'Sau nỗi đau khi mất đi đứa con thương, gia đình Jake Sully và Neytiri tiếp tục bị cuốn vào biến cố mới khi kẻ thù không đội trời chung Quaritch bắt tay với Varang - thủ lĩnh tộc Tro. Lần đầu trong suốt nhiều năm, đạo diễn James Cameron hé lộ mặt tối của người Na\'vi, mang đến những góc khuất của Pandora mà khán giả chưa từng thấy trong Avatar: Lửa Và Tro Tàn.',
-                'release_date' => '2025-12-19',
-                'early_premiere_date' => '2025-12-12',
-                'poster' => 'avatar.png',
-                'trailer' => 'https://www.youtube.com/watch?v=erhF0RAnYvo',
-                'rating' => null,
-                'age_limit' => 13,
-                'status' => 1,
-                'created_at' => '2025-12-11',
-            ],
-            [
-                'movie_id' => 27,
-                'title' => 'Chó Cưng Đứng Sợ',
-                'slug' => 'cho-cung-dung-so-27',
-                'cate_id' => 4,
-                'director' => 'Ben Leonberg, Scott Riehs',
-                'duration' => 73,
-                'description' => 'Một ngôi nhà cũ, một khởi đầu tưởng như bình yên - cho đến khi Indy, chủ chó trung thành, nhận ra có thứ gì đó đang dõi theo chủ của mình',
-                'release_date' => '2026-01-03',
-                'early_premiere_date' => '2025-12-25',
-                'poster' => 'cho-cung-dung-so.jpg',
-                'trailer' => 'https://www.youtube.com/watch?v=iKFVjVJxv4Q',
-                'rating' => null,
-                'age_limit' => 16,
-                'status' => 1,
-                'created_at' => '2025-12-11',
-            ],
->>>>>>> 3a03ec3 (final)
         ]);
     }
 }

@@ -10,18 +10,11 @@ class DatabaseSeeder extends Seeder {
             CinemaSeeder::class,
             ComboSeeder::class,
             RoomSeeder::class,
-<<<<<<< HEAD
             SeatSeeder::class,
             MovieSeeder::class,
             ShowSeeder::class,
             UserSeeder::class,
             AdminSeeder::class,
-=======
-            SeatSeeder::class,        // ✅ Thêm dòng này
-            MovieSeeder::class,       // ✅ Thêm dòng này
-            AdminSeeder::class,
-            UserSeeder::class,
->>>>>>> 3a03ec3 (final)
             PromoCodeSeeder::class,
         ]);
     }

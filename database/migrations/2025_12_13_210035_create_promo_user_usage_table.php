@@ -20,11 +20,7 @@ return new class extends Migration {
             
             $table->foreign('promo_code')->references('promo_code')->on('promocode')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade')->onUpdate('cascade');
-<<<<<<< HEAD
             $table->foreign('booking_code')->references('booking_code')->on('reservations')->onDelete('set null')->onUpdate('cascade');
-=======
-            $table->foreign('booking_code')->references('booking_code')->on('reservations')->onDelete('setNull')->onUpdate('cascade');
->>>>>>> 3a03ec3 (final)
         });
     }
 

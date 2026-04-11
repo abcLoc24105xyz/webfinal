@@ -45,11 +45,7 @@ return [
     'google' => [
     'client_id'     => env('GOOGLE_CLIENT_ID'),
     'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-<<<<<<< HEAD
     'redirect'      => env('GOOGLE_REDIRECT_URL', 'https://ghiencine.onrender.com/auth/google/callback'),
-=======
-    'redirect'      => env('GOOGLE_REDIRECT_URL', 'http://localhost/auth/google/callback'),
->>>>>>> 3a03ec3 (final)
     ],
 
     'recaptcha' => [

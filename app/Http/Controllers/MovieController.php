@@ -69,7 +69,6 @@ class MovieController extends Controller
             ->when($selectedCinemaId, fn($q) => $q->where('cinema_id', $selectedCinemaId))
             ->distinct()
             ->orderBy('show_date')
-<<<<<<< HEAD
             ->pluck('show_date'); // Carbon object
 
         // Xử lý suất chiếu sớm
@@ -78,31 +77,14 @@ class MovieController extends Controller
 
             $availableDates = $availableDates->map(fn($date) => $date instanceof Carbon ? $date->toDateString() : (string)$date);
 
-=======
-            ->pluck('show_date'); // ← Đây là Carbon object
-
-        // === SỬA TỪ ĐÂY ===
-        if ($hasEarlyPremiere) {
-            $earlyDateStr = $earlyPremiereDate->toDateString();
-
-            // Chuẩn hóa tất cả về string để so sánh
-            $availableDates = $availableDates->map(fn($date) => $date instanceof \Carbon\Carbon ? $date->toDateString() : (string)$date);
-
-            // Chỉ thêm nếu chưa có
->>>>>>> 3a03ec3 (final)
             if (!$availableDates->contains($earlyDateStr)) {
                 $availableDates->prepend($earlyDateStr);
             }
 
-<<<<<<< HEAD
-=======
-            // Loại trùng và sắp xếp lại
->>>>>>> 3a03ec3 (final)
             $availableDates = $availableDates->unique()->values();
         }
 
         // Xử lý suất chiếu sớm theo rạp được chọn
-<<<<<<< HEAD
         if ($hasEarlyPremiere && $selectedCinemaId) {
             $hasEarlyShowInCinema = Show::where('movie_id', $movie->movie_id)
                 ->where('cinema_id', $selectedCinemaId)
@@ -113,28 +95,6 @@ class MovieController extends Controller
             
             if (!$hasEarlyShowInCinema) {
                 $hasEarlyPremiere = false;
-=======
-        if ($hasEarlyPremiere) {
-            if ($selectedCinemaId) {
-                $hasEarlyShowInCinema = Show::where('movie_id', $movie->movie_id)
-                    ->where('cinema_id', $selectedCinemaId)
-                    ->whereDate('show_date', $earlyPremiereDate)
-                    ->where('remaining_seats', '>', 0)
-                    ->whereRaw("CONCAT(show_date, ' ', start_time) > ?", [$now])
-                    ->exists();
-                
-                if (!$hasEarlyShowInCinema) {
-                    $hasEarlyPremiere = false;
-                }
-            }
-
-            // Thêm ngày suất sớm vào danh sách
-            if ($hasEarlyPremiere) {
-                $availableDates = $availableDates->filter(
-                    fn($date) => $date !== $earlyPremiereDate->toDateString()
-                )->values();
-                $availableDates->prepend($earlyPremiereDate->toDateString());
->>>>>>> 3a03ec3 (final)
             }
         }
 
@@ -182,17 +142,12 @@ class MovieController extends Controller
         $movie = Movie::where('slug', $slug)->firstOrFail();
 
         $date = $request->filled('date')
-<<<<<<< HEAD
             ? Carbon::parse($request->date)->startOfDay()
-=======
-            ? Carbon::parse($request->date)
->>>>>>> 3a03ec3 (final)
             : Carbon::today('Asia/Ho_Chi_Minh');
 
         $cinemaId = $request->filled('cinema') ? (int)$request->cinema : null;
         $now = Carbon::now('Asia/Ho_Chi_Minh');
 
-<<<<<<< HEAD
         // Lấy danh sách rạp có suất chiếu (cần cho tiêu đề trong partial)
         $availableCinemas = Cinema::whereHas('shows', function ($q) use ($movie, $date, $now, $cinemaId) {
             $q->where('movie_id', $movie->movie_id)
@@ -202,8 +157,6 @@ class MovieController extends Controller
               ->when($cinemaId, fn($qq) => $qq->where('cinema_id', $cinemaId));
         })->orderBy('cinema_name')->get();
 
-=======
->>>>>>> 3a03ec3 (final)
         $shows = Show::with(['cinema', 'room'])
             ->where('movie_id', $movie->movie_id)
             ->whereDate('show_date', $date)
@@ -214,10 +167,6 @@ class MovieController extends Controller
             ->get()
             ->groupBy('cinema_id');
 
-<<<<<<< HEAD
         return view('movie.partials.showtimes', compact('shows', 'availableCinemas'));
-=======
-        return view('movie.partials.showtimes', compact('shows'));
->>>>>>> 3a03ec3 (final)
     }
 }

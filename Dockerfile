@@ -2,7 +2,6 @@ FROM php:8.2-fpm-alpine
 
 WORKDIR /app
 
-# System packages + PHP extensions
 RUN apk add --no-cache \
     nginx \
     bash \
@@ -32,11 +31,9 @@ RUN apk add --no-cache \
         intl \
     && rm -rf /var/cache/apk/*
 
-# Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Cache dependencies first
-COPY composer.json /
+COPY composer.json ./
 RUN composer install \
     --no-interaction \
     --prefer-dist \
@@ -44,17 +41,13 @@ RUN composer install \
     --optimize-autoloader \
     --no-scripts
 
-# Frontend deps cache
 COPY package.json package-lock.json* ./
 RUN if [ -f package.json ]; then npm ci; fi
 
-# Copy source
 COPY . .
 
-# Build assets only if Vite exists
 RUN if [ -f vite.config.js ]; then npm run build; else echo "Skip npm build"; fi
 
-# Permissions and directories
 RUN mkdir -p \
     /app/storage/logs \
     /app/storage/framework/cache \
@@ -69,7 +62,6 @@ RUN mkdir -p \
     && chmod -R 777 /app/storage/logs \
     && chmod 666 /app/storage/logs/laravel.log
 
-# Main nginx config
 RUN cat <<'EOF' > /etc/nginx/nginx.conf
 user nginx;
 worker_processes auto;
@@ -96,7 +88,6 @@ http {
 }
 EOF
 
-# Startup script
 RUN cat <<'EOF' > /start.sh
 #!/bin/sh
 set -e

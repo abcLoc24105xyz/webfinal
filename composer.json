@@ -31,11 +31,7 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-<<<<<<< HEAD
-        "app/Helpers/RecaptchaHelper.php"
-=======
-        "app/Helpers/recaptcha.php"
->>>>>>> 3a03ec3 (final)
+            "app/Helpers/RecaptchaHelper.php"
     ]
     },
     "autoload-dev": {

@@ -2,12 +2,13 @@ FROM php:8.2-fpm-alpine
 
 WORKDIR /app
 
+# System packages + PHP extensions
 RUN apk add --no-cache \
     nginx \
+    bash \
     curl \
     git \
     unzip \
-    bash \
     icu-dev \
     oniguruma-dev \
     libpng-dev \
@@ -17,9 +18,9 @@ RUN apk add --no-cache \
     libzip-dev \
     zlib-dev \
     nodejs \
-    npm
-
-RUN docker-php-ext-configure gd --with-jpeg --with-freetype --with-webp \
+    npm \
+    fcgi \
+    && docker-php-ext-configure gd --with-jpeg --with-freetype --with-webp \
     && docker-php-ext-install \
         pdo \
         pdo_mysql \
@@ -28,10 +29,13 @@ RUN docker-php-ext-configure gd --with-jpeg --with-freetype --with-webp \
         zip \
         bcmath \
         exif \
-        intl
+        intl \
+    && rm -rf /var/cache/apk/*
 
+# Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# Cache dependencies first
 COPY composer.json composer.lock ./
 RUN composer install \
     --no-interaction \
@@ -40,11 +44,17 @@ RUN composer install \
     --optimize-autoloader \
     --no-scripts
 
+# Frontend deps cache
+COPY package.json package-lock.json* ./
+RUN if [ -f package.json ]; then npm ci; fi
+
+# Copy source
 COPY . .
 
-RUN if [ -f package.json ]; then npm ci; fi
+# Build assets only if Vite exists
 RUN if [ -f vite.config.js ]; then npm run build; else echo "Skip npm build"; fi
 
+# Permissions and directories
 RUN mkdir -p \
     /app/storage/logs \
     /app/storage/framework/cache \
@@ -59,8 +69,34 @@ RUN mkdir -p \
     && chmod -R 777 /app/storage/logs \
     && chmod 666 /app/storage/logs/laravel.log
 
-COPY docker/nginx.conf /etc/nginx/nginx.conf
+# Main nginx config
+RUN cat <<'EOF' > /etc/nginx/nginx.conf
+user nginx;
+worker_processes auto;
 
+error_log /var/log/nginx/error.log warn;
+pid /var/run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 2048;
+    client_max_body_size 100M;
+
+    include /etc/nginx/http.d/*.conf;
+}
+EOF
+
+# Startup script
 RUN cat <<'EOF' > /start.sh
 #!/bin/sh
 set -e
@@ -83,7 +119,6 @@ php artisan cache:clear || true
 php artisan route:clear || true
 php artisan view:clear || true
 
-echo "Creating storage link..."
 rm -rf /app/public/storage || true
 php artisan storage:link || true
 
@@ -114,23 +149,10 @@ server {
 }
 EON
 
-echo "Testing nginx config..."
 nginx -t
 
-echo "Starting php-fpm..."
 php-fpm -D
-
-echo "Starting nginx on port ${PORT_TO_USE}..."
-nginx -g "daemon off;" &
-NGINX_PID=$!
-
-echo "Waiting for database..."
-sleep 10
-
-echo "Resetting database and seeding..."
-php artisan migrate:fresh --seed --force || true
-
-wait $NGINX_PID
+exec nginx -g "daemon off;"
 EOF
 
 RUN chmod +x /start.sh

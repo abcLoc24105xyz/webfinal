@@ -46,49 +46,24 @@ RUN if [ -f package.json ]; then npm ci; fi
 RUN if [ -f vite.config.js ]; then npm run build; else echo "Skip npm build"; fi
 
 RUN mkdir -p \
-    storage/logs \
-    storage/framework/cache \
-    storage/framework/sessions \
-    storage/framework/views \
-    storage/app/public \
-    bootstrap/cache \
-    public \
-    && touch storage/logs/laravel.log \
+    /app/storage/logs \
+    /app/storage/framework/cache \
+    /app/storage/framework/sessions \
+    /app/storage/framework/views \
+    /app/storage/app/public \
+    /app/bootstrap/cache \
+    /etc/nginx/http.d \
+    && touch /app/storage/logs/laravel.log \
     && chown -R www-data:www-data /app \
-    && chmod -R 775 storage bootstrap/cache \
-    && chmod -R 777 storage/logs \
-    && chmod 666 storage/logs/laravel.log
+    && chmod -R 775 /app/storage /app/bootstrap/cache \
+    && chmod -R 777 /app/storage/logs \
+    && chmod 666 /app/storage/logs/laravel.log
 
-RUN mkdir -p /etc/nginx/http.d
 COPY docker/nginx.conf /etc/nginx/nginx.conf
-
-RUN cat <<'EOF' > /etc/nginx/http.d/default.conf
-server {
-    listen 80;
-    server_name _;
-
-    root /app/public;
-    index index.php index.html;
-
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-
-    location ~ \.php$ {
-        include fastcgi_params;
-        fastcgi_pass 127.0.0.1:9000;
-        fastcgi_index index.php;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-    }
-
-    location ~ /\.ht {
-        deny all;
-    }
-}
-EOF
 
 RUN cat <<'EOF' > /start.sh
 #!/bin/sh
+set -e
 
 mkdir -p /app/storage/logs
 mkdir -p /app/storage/framework/cache
@@ -112,21 +87,54 @@ echo "Creating storage link..."
 rm -rf /app/public/storage || true
 php artisan storage:link || true
 
+PORT_TO_USE="${PORT:-10000}"
+
+cat > /etc/nginx/http.d/default.conf <<EON
+server {
+    listen ${PORT_TO_USE};
+    server_name _;
+
+    root /app/public;
+    index index.php index.html;
+
+    location / {
+        try_files \$uri \$uri/ /index.php?\$query_string;
+    }
+
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
+EON
+
+echo "Testing nginx config..."
+nginx -t
+
 echo "Starting php-fpm..."
 php-fpm -D
 
+echo "Starting nginx on port ${PORT_TO_USE}..."
+nginx -g "daemon off;" &
+NGINX_PID=$!
+
 echo "Waiting for database..."
-sleep 20
+sleep 10
 
 echo "Resetting database and seeding..."
-php artisan migrate:fresh --seed --force
+php artisan migrate:fresh --seed --force || true
 
-echo "Starting nginx..."
-nginx -g "daemon off;"
+wait $NGINX_PID
 EOF
 
 RUN chmod +x /start.sh
 
-EXPOSE 80
+EXPOSE 10000
 
 CMD ["sh", "/start.sh"]

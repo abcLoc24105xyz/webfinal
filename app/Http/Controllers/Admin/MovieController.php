@@ -9,7 +9,6 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class MovieController extends Controller
@@ -17,6 +16,37 @@ class MovieController extends Controller
     const STATUS_COMING_SOON = 1;
     const STATUS_SHOWING = 2;
     const STATUS_ENDED = 3;
+
+    /**
+     * Upload poster → public/poster/, trả về tên file
+     */
+    private function uploadPoster($file): string
+    {
+        $extension  = $file->getClientOriginalExtension();
+        $posterName = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $extension;
+        $folder     = public_path('poster');
+
+        if (!file_exists($folder)) {
+            mkdir($folder, 0755, true);
+        }
+
+        $file->move($folder, $posterName);
+
+        return $posterName;
+    }
+
+    /**
+     * Xóa poster cũ
+     */
+    private function deletePoster(?string $posterName): void
+    {
+        if ($posterName) {
+            $path = public_path('poster/' . $posterName);
+            if (file_exists($path)) {
+                @unlink($path);
+            }
+        }
+    }
 
     /**
      * Danh sách phim
@@ -41,9 +71,7 @@ class MovieController extends Controller
             $query->whereDate('release_date', $request->release_date);
         }
 
-        $movies = $query
-            ->latest('movie_id')
-            ->paginate(10);
+        $movies = $query->latest('movie_id')->paginate(10);
 
         return view('admin.movies.index', compact('movies'));
     }
@@ -80,15 +108,9 @@ class MovieController extends Controller
 
         try {
             //----------------------------------
-            // Upload poster → chỉ lưu tên file
+            // Upload poster
             //----------------------------------
-            $posterName = null;
-
-            if ($request->hasFile('poster')) {
-                $file       = $request->file('poster');
-                $posterName = time() . '_' . $file->getClientOriginalName();
-                $file->storeAs('', $posterName, 'public');
-            }
+            $posterName = $this->uploadPoster($request->file('poster'));
 
             //----------------------------------
             // Status
@@ -135,9 +157,7 @@ class MovieController extends Controller
 
             DB::rollBack();
 
-            if ($posterName) {
-                Storage::disk('public')->delete($posterName);
-            }
+            $this->deletePoster($posterName ?? null);
 
             return back()
                 ->withInput()
@@ -196,14 +216,8 @@ class MovieController extends Controller
             // Upload poster mới (nếu có)
             //----------------------------------
             if ($request->hasFile('poster')) {
-                if ($movie->poster) {
-                    Storage::disk('public')->delete($movie->poster);
-                }
-
-                $file            = $request->file('poster');
-                $posterName      = time() . '_' . $file->getClientOriginalName();
-                $file->storeAs('', $posterName, 'public');
-                $data['poster']  = $posterName;
+                $this->deletePoster($movie->poster);
+                $data['poster'] = $this->uploadPoster($request->file('poster'));
             }
 
             //----------------------------------
@@ -253,9 +267,7 @@ class MovieController extends Controller
         DB::beginTransaction();
 
         try {
-            if ($movie->poster) {
-                Storage::disk('public')->delete($movie->poster);
-            }
+            $this->deletePoster($movie->poster);
 
             $movie->delete();
 

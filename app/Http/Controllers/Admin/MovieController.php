@@ -52,7 +52,7 @@ class MovieController extends Controller
      */
     public function create()
     {
-        $categories = Category::orderBy('cate_name')->get();
+        $categories = Category::orderBy('name')->get();
 
         return view('admin.movies.create', compact('categories'));
     }
@@ -190,7 +190,7 @@ class MovieController extends Controller
     {
         $movie = Movie::findOrFail($id);
 
-        $categories = Category::orderBy('cate_name')->get();
+        $categories = Category::orderBy('name')->get();
 
         return view('admin.movies.edit', compact('movie', 'categories'));
     }

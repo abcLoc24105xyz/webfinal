@@ -37,13 +37,13 @@ class Movie extends Model
         'duration',
         'description',
         'release_date',
-        'early_premiere_date',
         'poster',
         'trailer',
         'rating',
         'age_limit',
         'status',
-        'created_at'
+    'created_at',
+    'early_premiere_date', // Thêm dòng này
     ];
 
     protected $casts = [

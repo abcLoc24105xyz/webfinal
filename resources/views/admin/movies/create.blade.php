@@ -21,7 +21,15 @@
             </a>
         </div>
 
-        {{-- SESSION SUCCESS MESSAGE --}}
+        {{-- SESSION ERROR --}}
+        @if(session('error'))
+            <div class="mb-6 p-4 rounded-lg bg-red-500/20 border border-red-500 text-red-200 flex items-center gap-3">
+                <i class="fas fa-times-circle text-xl"></i>
+                <span>{{ session('error') }}</span>
+            </div>
+        @endif
+
+        {{-- SESSION SUCCESS --}}
         @if(session('success'))
             <div class="mb-6 p-4 rounded-lg bg-green-500/20 border border-green-500 text-green-200 flex items-center gap-3">
                 <i class="fas fa-check-circle text-xl"></i>
@@ -113,7 +121,7 @@
                 </div>
             </div>
 
-            {{-- Card 2: Phân loại & Trạng thái --}}
+            {{-- Card 2: Phân loại --}}
             <div class="bg-black/40 backdrop-blur-md rounded-xl shadow-2xl border border-white/10 overflow-hidden">
                 <div class="p-5 bg-gradient-to-r from-purple-600/60 to-pink-600/60">
                     <h2 class="text-2xl font-bold text-white flex items-center gap-3">
@@ -127,24 +135,18 @@
                         <select name="age_limit" required class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/30 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition pr-10"
                                 style="background-image: url('data:image/svg+xml,%3csvg xmlns=%27https://www.w3.org/2000/svg%27 fill=%27%23a78bfa%27 viewBox=%270 0 24 24%27%3e%3cpath d=%27M7 10l5 5 5-5z%27/%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.2em;">
                             <option value="">-- Chọn giới hạn tuổi --</option>
-                            <option value="0" {{ old('age_limit') == '0' ? 'selected' : '' }}>Tất cả lứa tuổi (P)</option>
-                            <option value="13" {{ old('age_limit') == '13' ? 'selected' : '' }}>C13 - Dưới 13 tuổi cần người giám hộ</option>
-                            <option value="16" {{ old('age_limit') == '16' ? 'selected' : '' }}>C16 - Cấm trẻ em dưới 16 tuổi</option>
-                            <option value="18" {{ old('age_limit') == '18' ? 'selected' : '' }}>C18 - Cấm trẻ em dưới 18 tuổi</option>
+                            <option value="0"  {{ old('age_limit') === '0'  ? 'selected' : '' }}>Tất cả lứa tuổi (P)</option>
+                            <option value="13" {{ old('age_limit') == '13'  ? 'selected' : '' }}>C13 - Dưới 13 tuổi cần người giám hộ</option>
+                            <option value="16" {{ old('age_limit') == '16'  ? 'selected' : '' }}>C16 - Cấm trẻ em dưới 16 tuổi</option>
+                            <option value="18" {{ old('age_limit') == '18'  ? 'selected' : '' }}>C18 - Cấm trẻ em dưới 18 tuổi</option>
                         </select>
                         @error('age_limit') <span class="text-red-400 text-xs block mt-1">{{ $message }}</span> @enderror
                     </div>
 
-                   <div>
-                        <label class="block text-sm font-bold text-white mb-2">
-                            Trạng thái
-                        </label>
-
-                        <div
-                            class="w-full px-4 py-3 rounded-lg bg-blue-500/20 border border-blue-400 text-blue-200">
-
+                    <div>
+                        <label class="block text-sm font-bold text-white mb-2">Trạng thái</label>
+                        <div class="w-full px-4 py-3 rounded-lg bg-blue-500/20 border border-blue-400 text-blue-200">
                             Hệ thống sẽ tự động xác định trạng thái dựa vào ngày chiếu.
-
                         </div>
                     </div>
                 </div>
@@ -159,12 +161,21 @@
                 </div>
 
                 <div class="p-6 space-y-6">
+
+                    {{-- Poster upload + preview --}}
                     <div>
                         <label class="block text-sm font-bold text-white mb-2">Poster phim <span class="text-red-400">*</span></label>
-                        <input type="file" name="poster" required accept="image/*"
+                        <input type="file" name="poster" id="posterInput" required accept="image/*"
                                class="w-full px-6 py-8 rounded-xl bg-gradient-to-br from-purple-600/20 to-pink-600/20 border-2 border-dashed border-purple-400 text-white cursor-pointer hover:border-purple-300 hover:bg-purple-600/30 transition file:mr-4 file:py-3 file:px-6 file:rounded-lg file:border-0 file:bg-purple-600 file:text-white file:font-bold hover:file:bg-purple-700">
                         <p class="text-purple-300 text-xs mt-2">JPG, PNG, WebP • Tối đa 2MB • Tỷ lệ khuyến nghị: 2:3 (400x600px)</p>
                         @error('poster') <span class="text-red-400 text-xs block mt-1">{{ $message }}</span> @enderror
+
+                        {{-- Preview --}}
+                        <div id="posterPreviewWrapper" class="hidden mt-4">
+                            <p class="text-sm text-purple-300 mb-2">Xem trước poster:</p>
+                            <img id="posterPreview" src="#" alt="Poster preview"
+                                 class="h-48 rounded-lg object-cover border border-purple-400 shadow-lg">
+                        </div>
                     </div>
 
                     <div>
@@ -192,7 +203,7 @@
                     <i class="fas fa-times-circle"></i> Hủy bỏ
                 </a>
 
-                <button type="submit"
+                <button type="submit" id="submitBtn"
                         class="px-12 py-4 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-black text-lg shadow-2xl transition transform hover:scale-105 flex items-center justify-center gap-3">
                     <i class="fas fa-check-circle"></i> TẠO PHIM MỚI
                 </button>
@@ -211,128 +222,72 @@
         background: #1a1a2e !important;
         color: white !important;
     }
-    
-    /* Tooltip cho ngày chiếu sớm */
-    .early-premiere-info {
-        position: relative;
-    }
-    .early-premiere-info:hover::after {
-        content: "Ngày chiếu sớm cho phép tạo suất chiếu trước ngày công chiếu chính thức";
-        position: absolute;
-        bottom: 100%;
-        left: 0;
-        background: #1a1a2e;
-        color: white;
-        padding: 6px 10px;
-        border-radius: 4px;
-        font-size: 12px;
-        white-space: nowrap;
-        z-index: 10;
-        margin-bottom: 4px;
-    }
 </style>
 
 <script>
-    // Auto-validation: Ngày chiếu sớm phải trước ngày công chiếu
-   document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
 
-    const form = document.querySelector('form');
+    const form               = document.querySelector('form');
+    const earlyDateInput     = document.querySelector('input[name="early_premiere_date"]');
+    const releaseDateInput   = document.querySelector('input[name="release_date"]');
+    const posterInput        = document.getElementById('posterInput');
+    const posterPreview      = document.getElementById('posterPreview');
+    const posterPreviewWrapper = document.getElementById('posterPreviewWrapper');
+    const trailerInput       = document.querySelector('input[name="trailer"]');
+    const submitBtn          = document.getElementById('submitBtn');
 
-    const earlyDateInput =
-        document.querySelector('input[name="early_premiere_date"]');
-
-    const releaseDateInput =
-        document.querySelector('input[name="release_date"]');
-
-    const posterInput =
-        document.querySelector('input[name="poster"]');
-
-    const preview =
-        document.getElementById('posterPreview');
-
-    const trailer =
-        document.querySelector('input[name="trailer"]');
-
+    // ── Validate dates ──────────────────────────────────────────────
     function validateDates() {
-
         if (!earlyDateInput.value || !releaseDateInput.value) {
-
             earlyDateInput.setCustomValidity('');
             return;
-
         }
 
-        const early = new Date(earlyDateInput.value);
-
+        const early   = new Date(earlyDateInput.value);
         const release = new Date(releaseDateInput.value);
 
         if (early >= release) {
-
             earlyDateInput.classList.add('border-red-400');
             releaseDateInput.classList.add('border-red-400');
-
-            earlyDateInput.setCustomValidity(
-                'Ngày chiếu sớm phải trước ngày công chiếu.'
-            );
-
+            earlyDateInput.setCustomValidity('Ngày chiếu sớm phải trước ngày công chiếu.');
         } else {
-
             earlyDateInput.classList.remove('border-red-400');
             releaseDateInput.classList.remove('border-red-400');
-
             earlyDateInput.setCustomValidity('');
-
         }
-
     }
 
     earlyDateInput?.addEventListener('change', validateDates);
-
     releaseDateInput?.addEventListener('change', validateDates);
 
+    // ── Poster preview ───────────────────────────────────────────────
     posterInput?.addEventListener('change', function (e) {
-
         const file = e.target.files[0];
-
         if (!file) return;
 
         const reader = new FileReader();
-
         reader.onload = function (event) {
-
-            preview.src = event.target.result;
-
-            preview.classList.remove('hidden');
-
+            posterPreview.src = event.target.result;
+            posterPreviewWrapper.classList.remove('hidden');
         };
-
         reader.readAsDataURL(file);
-
     });
 
-    trailer?.addEventListener('blur', function () {
-
+    // ── Trailer hint ─────────────────────────────────────────────────
+    trailerInput?.addEventListener('blur', function () {
         if (
             this.value &&
             !this.value.includes('youtube.com') &&
             !this.value.includes('youtu.be')
         ) {
-
-            alert('Nên sử dụng link Youtube.');
-
+            alert('Nên sử dụng link YouTube.');
         }
-
     });
 
+    // ── Disable submit button on submit ──────────────────────────────
     form.addEventListener('submit', function () {
-
-        const btn = form.querySelector('button[type="submit"]');
-
-        btn.disabled = true;
-
-        btn.innerHTML =
-            '<i class="fas fa-spinner fa-spin"></i> Đang tạo phim...';
-
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tạo phim...';
     });
 
 });

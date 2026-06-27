@@ -150,5 +150,29 @@ Route::get('/debug-poster', function () {
         'sample_url'   => count($files) ? asset('poster/' . basename($files[0])) : null,
     ]);
 });
+
+Route::get('/fix-poster-names', function () {
+    $movies = \App\Models\Movie::whereNotNull('poster')->get();
+    $count  = 0;
+
+    foreach ($movies as $movie) {
+        $oldName = basename($movie->poster);
+        $ext     = pathinfo($oldName, PATHINFO_EXTENSION);
+        $newName = time() . '_' . \Illuminate\Support\Str::slug(pathinfo($oldName, PATHINFO_FILENAME)) . '.' . $ext;
+
+        $oldPath = public_path('poster/' . $oldName);
+        $newPath = public_path('poster/' . $newName);
+
+        if (file_exists($oldPath)) {
+            rename($oldPath, $newPath);
+            $movie->update(['poster' => $newName]);
+            $count++;
+        }
+
+        usleep(1000); // tránh trùng timestamp
+    }
+
+    return "Đã đổi tên $count file.";
+});
 // ==================== 404 FALLBACK ====================
 Route::fallback(fn() => redirect()->route('home'));

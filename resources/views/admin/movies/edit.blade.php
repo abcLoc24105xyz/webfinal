@@ -91,7 +91,8 @@
 
                         <div>
                             <label class="block text-sm font-bold text-white mb-2">Thời lượng (phút) <span class="text-red-400">*</span></label>
-                            <input type="number" name="duration" value="{{ old('duration', $movie->duration) }}" required min="30" max="300"
+                            {{-- Yêu cầu 4: Đổi min="30" thành min="1" --}}
+                            <input type="number" name="duration" value="{{ old('duration', $movie->duration) }}" required min="1" max="300"
                                    class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/30 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition">
                             @error('duration') <span class="text-red-400 text-xs block mt-1">{{ $message }}</span> @enderror
                         </div>
@@ -120,7 +121,7 @@
                 </div>
             </div>
 
-            {{-- CARD 2: Phân loại & Trạng thái (TỰ ĐỘNG) --}}
+            {{-- CARD 2: Phân loại & Trạng thái --}}
             <div class="bg-black/40 backdrop-blur-md rounded-xl shadow-2xl border border-white/10 overflow-hidden">
                 <div class="p-6 bg-gradient-to-r from-purple-600/60 to-pink-600/60">
                     <h2 class="text-2xl font-bold text-white flex items-center gap-3">
@@ -142,22 +143,34 @@
                         @error('age_limit') <span class="text-red-400 text-xs block mt-1">{{ $message }}</span> @enderror
                     </div>
 
+                    {{-- Yêu cầu 1: Bỏ hoàn toàn phần chọn và thay bằng khối hiển thị trạng thái tự động --}}
                     <div class="bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-blue-500/40 rounded-xl p-5">
                         <p class="text-blue-200 font-bold mb-3 flex items-center gap-2">
-                            <i class="fas fa-robot text-xl"></i> Trạng thái tự động
+                            <i class="fas fa-robot"></i>
+                            Trạng thái hiện tại
                         </p>
-                        <div class="text-2xl font-black mb-2">
-                            @if($movie->status == 1)
-                                <span class="text-cyan-400">Sắp chiếu</span>
-                            @elseif($movie->status == 2)
-                                <span class="text-green-400">Đang chiếu</span>
-                            @else
-                                <span class="text-red-400">Đã kết thúc</span>
-                            @endif
+
+                        @php
+                            $statusText = [
+                                1 => 'Sắp chiếu',
+                                2 => 'Đang chiếu',
+                                3 => 'Đã kết thúc'
+                            ];
+
+                            $statusColor = [
+                                1 => 'text-cyan-400',
+                                2 => 'text-green-400',
+                                3 => 'text-red-400'
+                            ];
+                        @endphp
+
+                        <div id="statusPreview"
+                             class="text-2xl font-black {{ $statusColor[$movie->status] ?? 'text-gray-400' }}">
+                            {{ $statusText[$movie->status] ?? 'Chưa xác định' }}
                         </div>
-                        <p class="text-blue-300 text-xs leading-relaxed">
-                            Hệ thống sẽ <strong>tự động cập nhật trạng thái</strong> sau khi bạn lưu,<br>
-                            dựa trên ngày chiếu sớm / ngày công chiếu.
+
+                        <p class="text-xs text-blue-300 mt-2">
+                            Trạng thái được cập nhật tự động theo ngày chiếu.
                         </p>
                     </div>
                 </div>
@@ -176,8 +189,9 @@
                         <div>
                             <label class="block text-sm font-bold text-white mb-2">Poster hiện tại</label>
                             @if($movie->poster)
-                                <img src="{{ asset('poster/' . $movie->poster) }}" alt="{{ $movie->title }}"
-                                     class="w-full max-w-xs rounded-lg shadow-lg border border-white/20">
+                                {{-- Yêu cầu 5: Cập nhật CSS cho thẻ img để ảnh không bị méo --}}
+                                <img src="{{ asset('poster/'.$movie->poster) }}" alt="{{ $movie->title }}"
+                                     class="rounded-lg shadow-lg border border-white/20 object-cover w-64 h-96">
                             @else
                                 <div class="bg-gray-800 border-2 border-dashed border-gray-600 rounded-lg w-full h-64 flex items-center justify-center text-gray-500">
                                     Chưa có poster
@@ -196,10 +210,23 @@
 
                     <div>
                         <label class="block text-sm font-bold text-white mb-2">Trailer YouTube (tùy chọn)</label>
-                        <input type="url" name="trailer" value="{{ old('trailer', $movie->trailer) }}"
+                        <input type="url" name="trailer" id="trailerInput" value="{{ old('trailer', $movie->trailer) }}"
                                class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/30 text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
                                placeholder="https://www.youtube.com/watch?v=...">
                         @error('trailer') <span class="text-red-400 text-xs block mt-1">{{ $message }}</span> @enderror
+                        
+                        {{-- Yêu cầu 6: Thêm khối Preview Video YouTube --}}
+                        <div id="trailerPreviewContainer" class="mt-4 {{ !$movie->trailer ? 'hidden' : '' }}">
+                            <iframe
+                                id="trailerPreview"
+                                width="100%"
+                                height="350"
+                                src="{{ $movie->trailer ? str_replace('watch?v=', 'embed/', $movie->trailer) : '' }}"
+                                frameborder="0"
+                                class="rounded-lg shadow-lg border border-white/10"
+                                allowfullscreen>
+                            </iframe>
+                        </div>
                     </div>
 
                     <div>
@@ -224,6 +251,85 @@
                     <i class="fas fa-save"></i> CẬP NHẬT PHIM
                 </button>
             </div>
+
+            {{-- Yêu cầu 2 & 3: Tích hợp các đoạn Script xử lý logic ngày và preview trạng thái ngay trước thẻ đóng </form> --}}
+            <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const early = document.querySelector("[name='early_premiere_date']");
+                const release = document.querySelector("[name='release_date']");
+                const preview = document.getElementById("statusPreview");
+
+                // Hàm cập nhật trạng thái thời gian thực dựa trên ngày nhập vào
+                function updateStatus(){
+                    let today = new Date();
+                    today.setHours(0,0,0,0); // Đưa về 0h để so sánh ngày chính xác
+
+                    let start = early.value
+                        ? new Date(early.value)
+                        : new Date(release.value);
+
+                    if(isNaN(start)) return;
+                    start.setHours(0,0,0,0);
+
+                    let end = new Date(start);
+                    end.setDate(end.getDate() + 28);
+                    end.setHours(0,0,0,0);
+
+                    if(today < start){
+                        preview.innerHTML = "Sắp chiếu";
+                        preview.className = "text-2xl font-black text-cyan-400";
+                    }
+                    else if(today <= end){
+                        preview.innerHTML = "Đang chiếu";
+                        preview.className = "text-2xl font-black text-green-400";
+                    }
+                    else{
+                        preview.innerHTML = "Đã kết thúc";
+                        preview.className = "text-2xl font-black text-red-400";
+                    }
+                }
+
+                // Hàm kiểm tra tính hợp lệ của Ngày chiếu sớm và Ngày công chiếu
+                function validateDates(){
+                    if(!early.value || !release.value)
+                        return;
+
+                    if(new Date(early.value) >= new Date(release.value)){
+                        alert("Ngày chiếu sớm phải trước ngày công chiếu chính thức.");
+                        early.value = "";
+                        updateStatus();
+                    }
+                }
+
+                // Lắng nghe sự kiện thay đổi trên các ô input date
+                early.addEventListener("change", () => { validateDates(); updateStatus(); });
+                release.addEventListener("change", () => { validateDates(); updateStatus(); });
+
+                // Chạy khởi tạo trạng thái ban đầu khi tải trang
+                updateStatus();
+
+                // Bonus: Cập nhật Preview Live khi đổi Link Trailer YouTube
+                const trailerInput = document.getElementById("trailerInput");
+                const trailerPreview = document.getElementById("trailerPreview");
+                const trailerContainer = document.getElementById("trailerPreviewContainer");
+
+                trailerInput.addEventListener("input", function() {
+                    let url = this.value.trim();
+                    if(url) {
+                        let embedUrl = url.replace("watch?v=", "embed/");
+                        // Xử lý thêm trường hợp link rút gọn youtu.be nếu có
+                        if(url.includes("youtu.be/")) {
+                            embedUrl = url.replace("youtu.be/", "youtube.com/embed/");
+                        }
+                        trailerPreview.src = embedUrl;
+                        trailerContainer.classList.remove("hidden");
+                    } else {
+                        trailerPreview.src = "";
+                        trailerContainer.classList.add("hidden");
+                    }
+                });
+            });
+            </script>
         </form>
     </div>
 </div>

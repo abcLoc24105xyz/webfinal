@@ -117,7 +117,7 @@
             <div class="bg-black/40 backdrop-blur-md rounded-xl shadow-2xl border border-white/10 overflow-hidden">
                 <div class="p-5 bg-gradient-to-r from-purple-600/60 to-pink-600/60">
                     <h2 class="text-2xl font-bold text-white flex items-center gap-3">
-                        <i class="fas fa-tags"></i> Phân loại & Trạng thái
+                        <i class="fas fa-tags"></i> Phân loại phim
                     </h2>
                 </div>
 
@@ -136,15 +136,16 @@
                     </div>
 
                    <div>
-                        <label class="block text-sm font-bold text-white mb-2">Trạng thái <span class="text-red-400">*</span></label>
-                        <select name="status" required class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/30 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition pr-10"
-                                style="background-image: url('data:image/svg+xml,%3csvg xmlns=%27https://www.w3.org/2000/svg%27 fill=%27%23a78bfa%27 viewBox=%270 0 24 24%27%3e%3cpath d=%27M7 10l5 5 5-5z%27/%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.2em;">
-                            
-                            <option value="1" selected>Sắp chiếu</option>
-                            <option value="2">Đang chiếu</option>
-                            <option value="3">Ngừng chiếu</option>
-                        </select>
-                        @error('status') <span class="text-red-400 text-xs block mt-1">{{ $message }}</span> @enderror
+                        <label class="block text-sm font-bold text-white mb-2">
+                            Trạng thái
+                        </label>
+
+                        <div
+                            class="w-full px-4 py-3 rounded-lg bg-blue-500/20 border border-blue-400 text-blue-200">
+
+                            Hệ thống sẽ tự động xác định trạng thái dựa vào ngày chiếu.
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -233,28 +234,107 @@
 
 <script>
     // Auto-validation: Ngày chiếu sớm phải trước ngày công chiếu
-    document.addEventListener('DOMContentLoaded', function() {
-        const earlyDateInput = document.querySelector('input[name="early_premiere_date"]');
-        const releaseDateInput = document.querySelector('input[name="release_date"]');
-        
-        function validateDates() {
-            if (earlyDateInput.value && releaseDateInput.value) {
-                const early = new Date(earlyDateInput.value);
-                const release = new Date(releaseDateInput.value);
-                
-                if (early >= release) {
-                    earlyDateInput.classList.add('border-red-400');
-                    releaseDateInput.classList.add('border-red-400');
-                    alert('Ngày chiếu sớm phải trước ngày công chiếu chính thức!');
-                } else {
-                    earlyDateInput.classList.remove('border-red-400');
-                    releaseDateInput.classList.remove('border-red-400');
-                }
-            }
+   document.addEventListener('DOMContentLoaded', function () {
+
+    const form = document.querySelector('form');
+
+    const earlyDateInput =
+        document.querySelector('input[name="early_premiere_date"]');
+
+    const releaseDateInput =
+        document.querySelector('input[name="release_date"]');
+
+    const posterInput =
+        document.querySelector('input[name="poster"]');
+
+    const preview =
+        document.getElementById('posterPreview');
+
+    const trailer =
+        document.querySelector('input[name="trailer"]');
+
+    function validateDates() {
+
+        if (!earlyDateInput.value || !releaseDateInput.value) {
+
+            earlyDateInput.setCustomValidity('');
+            return;
+
         }
-        
-        earlyDateInput?.addEventListener('change', validateDates);
-        releaseDateInput?.addEventListener('change', validateDates);
+
+        const early = new Date(earlyDateInput.value);
+
+        const release = new Date(releaseDateInput.value);
+
+        if (early >= release) {
+
+            earlyDateInput.classList.add('border-red-400');
+            releaseDateInput.classList.add('border-red-400');
+
+            earlyDateInput.setCustomValidity(
+                'Ngày chiếu sớm phải trước ngày công chiếu.'
+            );
+
+        } else {
+
+            earlyDateInput.classList.remove('border-red-400');
+            releaseDateInput.classList.remove('border-red-400');
+
+            earlyDateInput.setCustomValidity('');
+
+        }
+
+    }
+
+    earlyDateInput?.addEventListener('change', validateDates);
+
+    releaseDateInput?.addEventListener('change', validateDates);
+
+    posterInput?.addEventListener('change', function (e) {
+
+        const file = e.target.files[0];
+
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+
+            preview.src = event.target.result;
+
+            preview.classList.remove('hidden');
+
+        };
+
+        reader.readAsDataURL(file);
+
     });
+
+    trailer?.addEventListener('blur', function () {
+
+        if (
+            this.value &&
+            !this.value.includes('youtube.com') &&
+            !this.value.includes('youtu.be')
+        ) {
+
+            alert('Nên sử dụng link Youtube.');
+
+        }
+
+    });
+
+    form.addEventListener('submit', function () {
+
+        const btn = form.querySelector('button[type="submit"]');
+
+        btn.disabled = true;
+
+        btn.innerHTML =
+            '<i class="fas fa-spinner fa-spin"></i> Đang tạo phim...';
+
+    });
+
+});
 </script>
 @endsection

@@ -8,128 +8,135 @@ use Carbon\Carbon;
 class Movie extends Model
 {
     protected $table = 'movies';
+
     protected $primaryKey = 'movie_id';
+
+    // movie_id là AUTO_INCREMENT
+    public $incrementing = true;
+
+    protected $keyType = 'int';
+
     public $timestamps = false;
 
-    // Status constants
+    // ==================== STATUS ====================
     const STATUS_COMING_SOON = 1;
     const STATUS_SHOWING = 2;
     const STATUS_ENDED = 3;
 
-    // Age limit constants
+    // ==================== AGE LIMIT ====================
     const AGE_LIMIT_P = 0;
     const AGE_LIMIT_T13 = 13;
     const AGE_LIMIT_T16 = 16;
     const AGE_LIMIT_T18 = 18;
 
     protected $fillable = [
-        'title', 'slug', 'cate_id', 'director', 'duration', 'description',
-        'release_date', 'early_premiere_date', 'poster', 'trailer', 
-        'rating', 'age_limit', 'status', 'created_at'
+        'title',
+        'slug',
+        'cate_id',
+        'director',
+        'duration',
+        'description',
+        'release_date',
+        'early_premiere_date',
+        'poster',
+        'trailer',
+        'rating',
+        'age_limit',
+        'status',
+        'created_at'
     ];
 
     protected $casts = [
-        'release_date'         => 'date',
-        'early_premiere_date'  => 'date',
-        'created_at'           => 'datetime',
+        'release_date' => 'date',
+        'early_premiere_date' => 'date',
+        'created_at' => 'datetime',
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    */
 
     public function category()
     {
-        return $this->belongsTo(Category::class, 'cate_id');
+        return $this->belongsTo(Category::class, 'cate_id', 'cate_id');
     }
 
     public function shows()
     {
-        return $this->hasMany(Show::class, 'movie_id');
+        return $this->hasMany(Show::class, 'movie_id', 'movie_id');
     }
 
-    /**
-     * Scope: Lấy phim sắp chiếu
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Query Scope
+    |--------------------------------------------------------------------------
+    */
+
     public function scopeComingSoon($query)
     {
         return $query->where('status', self::STATUS_COMING_SOON);
     }
 
-    /**
-     * Scope: Lấy phim đang chiếu
-     */
     public function scopeShowing($query)
     {
         return $query->where('status', self::STATUS_SHOWING);
     }
 
-    /**
-     * Scope: Lấy phim đã kết thúc
-     */
     public function scopeEnded($query)
     {
         return $query->where('status', self::STATUS_ENDED);
     }
 
-    /**
-     * Kiểm tra có chiếu sớm không
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Helper
+    |--------------------------------------------------------------------------
+    */
+
     public function hasEarlyPremiere()
     {
-        return !is_null($this->early_premiere_date);
+        return !empty($this->early_premiere_date);
     }
 
-    /**
-     * Lấy ngày bắt đầu chiếu
-     */
     public function getStartShowingDate()
     {
-        return $this->hasEarlyPremiere() 
-            ? $this->early_premiere_date 
-            : $this->release_date;
+        return $this->early_premiere_date ?: $this->release_date;
     }
 
-    /**
-     * Lấy nhãn status
-     */
     public function getStatusLabel()
     {
-        return match($this->status) {
+        return match ($this->status) {
             self::STATUS_COMING_SOON => 'Sắp chiếu',
-            self::STATUS_SHOWING     => 'Đang chiếu',
-            self::STATUS_ENDED       => 'Kết thúc',
-            default                  => 'Không xác định'
+            self::STATUS_SHOWING => 'Đang chiếu',
+            self::STATUS_ENDED => 'Kết thúc',
+            default => 'Không xác định',
         };
     }
 
-    /**
-     * Lấy nhãn tuổi
-     */
     public function getAgeLimitLabel()
     {
-        return match($this->age_limit) {
-            self::AGE_LIMIT_P   => 'P - Phổ biến',
+        return match ($this->age_limit) {
+            self::AGE_LIMIT_P => 'P',
             self::AGE_LIMIT_T13 => 'T13',
             self::AGE_LIMIT_T16 => 'T16',
             self::AGE_LIMIT_T18 => 'T18',
-            default             => 'Không xác định'
+            default => '-',
         };
     }
 
-    /**
-     * Format release date
-     */
     public function getFormattedReleaseDateAttribute()
     {
-        return $this->release_date 
-            ? $this->release_date->format('d/m/Y') 
-            : 'Chưa xác định';
+        return $this->release_date
+            ? $this->release_date->format('d/m/Y')
+            : '-';
     }
 
-    /**
-     * Format early premiere date
-     */
     public function getFormattedEarlyPremiereDateAttribute()
     {
-        return $this->hasEarlyPremiere() 
-            ? $this->early_premiere_date->format('d/m/Y') 
+        return $this->early_premiere_date
+            ? $this->early_premiere_date->format('d/m/Y')
             : '-';
     }
 }

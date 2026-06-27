@@ -141,5 +141,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
+Route::get('/debug-poster', function () {
+    $files = glob(public_path('poster/*'));
+    return response()->json([
+        'public_path'  => public_path('poster'),
+        'files'        => array_map('basename', $files),
+        'count'        => count($files),
+        'sample_url'   => count($files) ? asset('poster/' . basename($files[0])) : null,
+    ]);
+});
 // ==================== 404 FALLBACK ====================
 Route::fallback(fn() => redirect()->route('home'));

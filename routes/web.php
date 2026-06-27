@@ -174,5 +174,10 @@ Route::get('/fix-poster-names', function () {
 
     return "Đã đổi tên $count file.";
 });
+
+Route::get('/debug-db-poster', function () {
+    return \App\Models\Movie::whereNotNull('poster')
+        ->pluck('poster', 'movie_id');
+});
 // ==================== 404 FALLBACK ====================
 Route::fallback(fn() => redirect()->route('home'));

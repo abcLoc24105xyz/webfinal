@@ -48,6 +48,7 @@
         </div>
     </div>
 
+    {{-- Scroll Indicator với animation mũi tên --}}
     <a href="#phimnoibat" class="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 group cursor-pointer">
         <div class="flex flex-col items-center gap-2 animate-bounce">
             <svg class="w-6 h-6 text-white group-hover:text-purple-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,7 +78,8 @@
                 <div class="group relative h-full transform transition-all duration-300 hover:scale-105">
                     <a href="{{ route('movie.detail', $movie->slug) }}" class="block h-full">
                         <div class="relative overflow-hidden rounded-2xl shadow-lg bg-gray-200 aspect-[2/3]">
-
+                            @php $filename = $movie->poster ? basename($movie->poster) : null; @endphp
+                            
                             @if($movie->age_limit)
                                 <div class="absolute top-3 left-3 z-20">
                                     <span class="px-2.5 py-1 bg-gray-900/80 backdrop-blur-md text-white text-xs font-bold rounded-lg border border-white/20 shadow-lg">
@@ -87,10 +89,9 @@
                             @endif
 
                             <img 
-                                src="{{ $movie->poster ? asset('poster/' . basename($movie->poster)) : 'https://via.placeholder.com/400x600/e2e8f0/94a3b8?text=' . urlencode($movie->title) }}"
+                                src="{{ $filename && file_exists(public_path('poster/'.$filename)) ? asset('poster/'.$filename) : 'https://via.placeholder.com/400x600/e2e8f0/94a3b8?text=' . urlencode($movie->title) }}"
                                 alt="{{ $movie->title }}"
-                                class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out"
-                                onerror="this.src='https://via.placeholder.com/400x600/e2e8f0/94a3b8?text={{ urlencode($movie->title) }}'">
+                                class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out">
                             
                             <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
                                 <div class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
@@ -160,12 +161,12 @@
 
                 <a href="{{ route('movie.detail', $movie->slug) }}" class="group block h-full transform transition-all duration-300 hover:scale-105">
                     <div class="relative overflow-hidden rounded-2xl bg-slate-800 aspect-[2/3] border border-slate-700 group-hover:border-purple-500/50 transition-colors">
+                        @php $filename = $movie->poster ? basename($movie->poster) : null; @endphp
                         
                         <img 
-                            src="{{ $movie->poster ? asset('poster/' . basename($movie->poster)) : 'https://via.placeholder.com/400x600/1e293b/94a3b8?text=' . urlencode($movie->title) }}"
+                            src="{{ $filename && file_exists(public_path('poster/'.$filename)) ? asset('poster/'.$filename) : 'https://via.placeholder.com/400x600/1e293b/94a3b8?text=' . urlencode($movie->title) }}"
                             alt="{{ $movie->title }}"
-                            class="w-full h-full object-cover filter brightness-75 group-hover:brightness-100 group-hover:scale-105 transition-all duration-500 ease-out"
-                            onerror="this.src='https://via.placeholder.com/400x600/1e293b/94a3b8?text={{ urlencode($movie->title) }}'">
+                            class="w-full h-full object-cover filter brightness-75 group-hover:brightness-100 group-hover:scale-105 transition-all duration-500 ease-out">
 
                         <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black via-black/80 to-transparent">
                             <div class="flex items-center justify-between mb-2">

@@ -141,9 +141,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Duyệt đơn hàng thủ công
         Route::get('/payments', [App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('payments.index');
-        Route::get('/payments/{payment}', [App\Http\Controllers\Admin\PaymentController::class, 'show'])->name('payments.show');
-        Route::patch('/payments/{payment}/confirm', [App\Http\Controllers\Admin\PaymentController::class, 'confirm'])->name('payments.confirm');
-        Route::patch('/payments/{payment}/cancel', [App\Http\Controllers\Admin\PaymentController::class, 'cancel'])->name('payments.cancel');
+        Route::get('/payments/{reservation}', [App\Http\Controllers\Admin\PaymentController::class, 'show'])->name('payments.show');
+        Route::patch('/payments/{reservation}/confirm', [App\Http\Controllers\Admin\PaymentController::class, 'confirm'])->name('payments.confirm');
+        Route::patch('/payments/{reservation}/cancel', [App\Http\Controllers\Admin\PaymentController::class, 'cancel'])->name('payments.cancel');
     });
 });
 

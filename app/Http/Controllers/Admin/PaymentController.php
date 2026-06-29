@@ -3,127 +3,87 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Payment;
-use App\Models\Promocode;
+use App\Models\Reservation;
 use App\Models\PromoUserUsage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;   // ← BẮT BUỘC
-use Illuminate\Support\Facades\Session;
 
 class PaymentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $query = Payment::with(['user', 'reservation.show.movie'])
+        $query = Reservation::with(['user', 'show.movie'])
             ->orderByDesc('created_at');
 
-        if (request()->filled('status')) {
-            $query->where('status', request('status'));
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
         }
 
-        $payments = $query->paginate(20);
+        $reservations = $query->paginate(20);
 
-        return view('admin.payments.index', compact('payments'));
+        return view('admin.payments.index', compact('reservations'));
     }
 
-    public function show(Payment $payment)
+    public function show(Reservation $reservation)
     {
-        $payment->load(['user', 'reservation.show.movie', 'reservation.seats', 'reservation.combos']);
-        return view('admin.payments.show', compact('payment'));
+        $reservation->load(['user', 'show.movie', 'show.room.cinema', 'seats', 'combos']);
+        return view('admin.payments.show', compact('reservation'));
     }
 
     /**
-     * Xác nhận thủ công thanh toán MoMo + LƯU TRACKING MÃ GIẢM GIÁ
+     * Duyệt thủ công: pending → confirmed + sinh ticket_code nếu chưa có
      */
-    public function confirm(Request $request, Payment $payment)
+    public function confirm(Reservation $reservation)
     {
-        if ($payment->status !== 'pending') {
-            return back()->with('error', 'Chỉ có thể xác nhận đơn hàng đang chờ!');
+        if ($reservation->status !== 'pending') {
+            return back()->with('error', 'Chỉ có thể duyệt đơn hàng đang chờ!');
         }
 
         DB::beginTransaction();
-
         try {
-            // Cập nhật trạng thái thanh toán
-            $payment->update([
-                'status' => 'completed',
-                'paid_at' => now(),
+            $ticketCode = $reservation->ticket_code;
+            if (!$ticketCode) {
+                do {
+                    $ticketCode = 'TKT' . now()->format('dmy') . strtoupper(bin2hex(random_bytes(3)));
+                } while (Reservation::where('ticket_code', $ticketCode)->exists());
+            }
+
+            $reservation->update([
+                'status'      => 'confirmed',
+                'ticket_code' => $ticketCode,
+                'paid_at'     => now(),
+                'expires_at'  => null,
             ]);
 
-            // Cập nhật đặt chỗ
-            $payment->reservation->update(['status' => 'confirmed']);
-
-            // Lưu tracking mã giảm giá nếu có
-            $this->recordPromoUsage($payment->reservation);
-
             DB::commit();
-
-            return back()->with('success', 'Đã xác nhận thanh toán thành công!');
+            return back()->with('success', 'Đã duyệt đơn hàng ' . $reservation->booking_code . ' thành công!');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Lỗi: ' . $e->getMessage());
         }
     }
 
-
-    public function cancel(Request $request, Payment $payment)
+    /**
+     * Hủy đơn hàng
+     */
+    public function cancel(Reservation $reservation)
     {
-        if (!in_array($payment->status, ['pending', 'completed'])) {
-            return back()->with('error', 'Không thể hủy trạng thái này!');
+        if (!in_array($reservation->status, ['pending', 'confirmed', 'paid'])) {
+            return back()->with('error', 'Không thể hủy đơn hàng ở trạng thái này!');
         }
 
         DB::beginTransaction();
-
         try {
-            $payment->update(['status' => 'cancelled']);
-            $payment->reservation->update(['status' => 'cancelled']);
+            $reservation->update(['status' => 'cancelled']);
 
-            // Xóa tracking mã giảm giá
-            PromoUserUsage::where('booking_code', $payment->reservation->booking_code)->delete();
+            // Xóa tracking mã giảm giá nếu có
+            PromoUserUsage::where('booking_code', $reservation->booking_code)->delete();
 
             DB::commit();
-
-            return back()->with('success', 'Đã hủy thanh toán và đặt chỗ!');
+            return back()->with('success', 'Đã hủy đơn hàng ' . $reservation->booking_code . '!');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Lỗi: ' . $e->getMessage());
-        }
-    }
-
-
-    /**
-     * HELPER: Lưu tracking mã giảm giá
-     */
-    private function recordPromoUsage($reservation)
-    {
-        // Ưu tiên lấy mã từ session
-        $promoCode = Session::get('applied_promo');
-
-        // Nếu có mã giảm giá
-        if ($promoCode) {
-            $promo = Promocode::find($promoCode);
-
-            if (!$promo) {
-                return;
-            }
-
-            try {
-                PromoUserUsage::firstOrCreate(
-                    [
-                        'promo_code' => $promoCode,
-                        'user_id' => $reservation->user_id,
-                    ],
-                    [
-                        'booking_code' => $reservation->booking_code,
-                    ]
-                );
-
-                // Tăng số lần dùng
-                $promo->increment('used_count');
-            } catch (\Exception $e) {
-                Log::warning('Promo usage tracking failed: ' . $e->getMessage());
-            }
         }
     }
 }

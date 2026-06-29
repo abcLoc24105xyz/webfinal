@@ -49,7 +49,7 @@ class PaymentController extends Controller
             }
 
             $reservation->update([
-                'status'      => 'confirmed',
+                'status'      => 'paid',
                 'ticket_code' => $ticketCode,
                 'paid_at'     => now(),
                 'expires_at'  => null,

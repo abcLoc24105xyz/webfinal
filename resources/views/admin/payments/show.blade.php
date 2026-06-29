@@ -38,8 +38,7 @@
                     @php
                         $badges = [
                             'pending'   => ['bg-yellow-500/20 text-yellow-200 border-yellow-500', 'Chờ duyệt'],
-                            'confirmed' => ['bg-green-500/20 text-green-200 border-green-500',   'Đã duyệt'],
-                            'paid'      => ['bg-blue-500/20 text-blue-200 border-blue-500',      'Đã thanh toán'],
+                            'paid'      => ['bg-green-500/20 text-green-200 border-green-500',   'Đã duyệt'],
                             'cancelled' => ['bg-red-500/20 text-red-200 border-red-500',         'Đã hủy'],
                             'expired'   => ['bg-gray-500/20 text-gray-300 border-gray-500',      'Hết hạn'],
                         ];
@@ -58,7 +57,7 @@
                                 </button>
                             </form>
                         @endif
-                        @if(in_array($reservation->status, ['pending', 'confirmed', 'paid']))
+                        @if(in_array($reservation->status, ['pending', 'paid']))
                             <form action="{{ route('admin.payments.cancel', $reservation->booking_code) }}" method="POST"
                                   onsubmit="return confirm('Hủy đơn hàng này?')">
                                 @csrf @method('PATCH')

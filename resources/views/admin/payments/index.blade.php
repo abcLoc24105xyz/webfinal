@@ -23,15 +23,10 @@
                           {{ request('status') === 'pending' ? 'bg-yellow-500 border-yellow-400 text-black' : 'bg-white/10 border-white/20 text-yellow-300 hover:bg-white/20' }}">
                     <i class="fas fa-clock mr-1"></i> Chờ duyệt
                 </a>
-                <a href="{{ route('admin.payments.index', ['status' => 'confirmed']) }}"
-                   class="px-4 py-2 rounded-xl text-sm font-bold border transition
-                          {{ request('status') === 'confirmed' ? 'bg-green-500 border-green-400 text-black' : 'bg-white/10 border-white/20 text-green-300 hover:bg-white/20' }}">
-                    <i class="fas fa-check-circle mr-1"></i> Đã duyệt
-                </a>
                 <a href="{{ route('admin.payments.index', ['status' => 'paid']) }}"
                    class="px-4 py-2 rounded-xl text-sm font-bold border transition
-                          {{ request('status') === 'paid' ? 'bg-blue-500 border-blue-400 text-white' : 'bg-white/10 border-white/20 text-blue-300 hover:bg-white/20' }}">
-                    <i class="fas fa-money-bill mr-1"></i> Đã thanh toán
+                          {{ request('status') === 'paid' ? 'bg-green-500 border-green-400 text-black' : 'bg-white/10 border-white/20 text-green-300 hover:bg-white/20' }}">
+                    <i class="fas fa-check-circle mr-1"></i> Đã duyệt
                 </a>
                 <a href="{{ route('admin.payments.index', ['status' => 'cancelled']) }}"
                    class="px-4 py-2 rounded-xl text-sm font-bold border transition
@@ -106,8 +101,7 @@
                                 @php
                                     $badges = [
                                         'pending'   => ['bg-yellow-500/20 text-yellow-200 border-yellow-500', 'fa-clock',        'Chờ duyệt'],
-                                        'confirmed' => ['bg-green-500/20 text-green-200 border-green-500',   'fa-check-circle', 'Đã duyệt'],
-                                        'paid'      => ['bg-blue-500/20 text-blue-200 border-blue-500',      'fa-money-bill',   'Đã thanh toán'],
+                                        'paid'      => ['bg-green-500/20 text-green-200 border-green-500',   'fa-check-circle', 'Đã duyệt'],
                                         'cancelled' => ['bg-red-500/20 text-red-200 border-red-500',         'fa-times-circle', 'Đã hủy'],
                                         'expired'   => ['bg-gray-500/20 text-gray-300 border-gray-500',      'fa-hourglass-end','Hết hạn'],
                                     ];
@@ -139,7 +133,7 @@
                                             </button>
                                         </form>
                                     @endif
-                                    @if(in_array($r->status, ['pending', 'confirmed', 'paid']))
+                                    @if(in_array($r->status, ['pending', 'paid']))
                                         <form action="{{ route('admin.payments.cancel', $r->booking_code) }}" method="POST" class="inline"
                                               onsubmit="return confirm('Hủy đơn {{ $r->booking_code }}?')">
                                             @csrf @method('PATCH')

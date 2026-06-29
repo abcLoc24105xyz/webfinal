@@ -51,6 +51,7 @@
                     ['route' => 'admin.combos.index', 'icon' => 'fas fa-glass-whiskey', 'label' => 'Quản lý Combo', 'match' => 'admin.combos.*'],
                     ['route' => 'admin.promocodes.index', 'icon' => 'fas fa-tag', 'label' => 'Mã Giảm Giá', 'match' => 'admin.promocodes.*'],
                     ['route' => 'admin.revenue.index', 'icon' => 'fas fa-chart-line', 'label' => 'Doanh Thu'],
+                    ['route' => 'admin.payments.index', 'icon' => 'fas fa-clipboard-check', 'label' => 'Duyệt Đơn Hàng', 'match' => 'admin.payments.*'],
                     ['route' => 'admin.customers', 'icon' => 'fas fa-users', 'label' => 'Khách Hàng'],
                 ];
             @endphp

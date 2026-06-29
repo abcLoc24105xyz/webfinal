@@ -138,46 +138,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/customers', [App\Http\Controllers\Admin\CustomerController::class, 'index'])->name('customers');
         Route::post('/customers/{user}/block', [App\Http\Controllers\Admin\CustomerController::class, 'block'])->name('customers.block');
         Route::post('/customers/{user}/unblock', [App\Http\Controllers\Admin\CustomerController::class, 'unblock'])->name('customers.unblock');
+
+        // Duyệt đơn hàng thủ công
+        Route::get('/payments', [App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('payments.index');
+        Route::get('/payments/{payment}', [App\Http\Controllers\Admin\PaymentController::class, 'show'])->name('payments.show');
+        Route::patch('/payments/{payment}/confirm', [App\Http\Controllers\Admin\PaymentController::class, 'confirm'])->name('payments.confirm');
+        Route::patch('/payments/{payment}/cancel', [App\Http\Controllers\Admin\PaymentController::class, 'cancel'])->name('payments.cancel');
     });
 });
 
-Route::get('/debug-poster', function () {
-    $files = glob(public_path('poster/*'));
-    return response()->json([
-        'public_path'  => public_path('poster'),
-        'files'        => array_map('basename', $files),
-        'count'        => count($files),
-        'sample_url'   => count($files) ? asset('poster/' . basename($files[0])) : null,
-    ]);
-});
-
-Route::get('/fix-poster-names', function () {
-    $movies = \App\Models\Movie::whereNotNull('poster')->get();
-    $count  = 0;
-
-    foreach ($movies as $movie) {
-        $oldName = basename($movie->poster);
-        $ext     = pathinfo($oldName, PATHINFO_EXTENSION);
-        $newName = time() . '_' . \Illuminate\Support\Str::slug(pathinfo($oldName, PATHINFO_FILENAME)) . '.' . $ext;
-
-        $oldPath = public_path('poster/' . $oldName);
-        $newPath = public_path('poster/' . $newName);
-
-        if (file_exists($oldPath)) {
-            rename($oldPath, $newPath);
-            $movie->update(['poster' => $newName]);
-            $count++;
-        }
-
-        usleep(1000); // tránh trùng timestamp
-    }
-
-    return "Đã đổi tên $count file.";
-});
-
-Route::get('/debug-db-poster', function () {
-    return \App\Models\Movie::whereNotNull('poster')
-        ->pluck('poster', 'movie_id');
-});
 // ==================== 404 FALLBACK ====================
 Route::fallback(fn() => redirect()->route('home'));

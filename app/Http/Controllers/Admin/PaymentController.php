@@ -15,9 +15,14 @@ class PaymentController extends Controller
 {
     public function index()
     {
-        $payments = Payment::with(['user', 'reservation.show.movie'])
-            ->orderByDesc('created_at')
-            ->paginate(20);
+        $query = Payment::with(['user', 'reservation.show.movie'])
+            ->orderByDesc('created_at');
+
+        if (request()->filled('status')) {
+            $query->where('status', request('status'));
+        }
+
+        $payments = $query->paginate(20);
 
         return view('admin.payments.index', compact('payments'));
     }

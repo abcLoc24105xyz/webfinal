@@ -4,9 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Reservation;
+use App\Models\ReservationSeat;
+use App\Models\ReservationCombo;
 use App\Models\PromoUserUsage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class PaymentController extends Controller
 {
@@ -26,12 +30,12 @@ class PaymentController extends Controller
 
     public function show(Reservation $reservation)
     {
-        $reservation->load(['user', 'show.movie', 'show.room.cinema', 'seats', 'combos']);
+        $reservation->load(['user', 'show.movie', 'show.room', 'seats', 'combos']);
         return view('admin.payments.show', compact('reservation'));
     }
 
     /**
-     * Duyệt thủ công: pending → confirmed + sinh ticket_code nếu chưa có
+     * Duyệt thủ công: pending → paid + sinh ticket_code + gửi mail cho khách
      */
     public function confirm(Reservation $reservation)
     {
@@ -41,6 +45,7 @@ class PaymentController extends Controller
 
         DB::beginTransaction();
         try {
+            // Sinh ticket_code nếu chưa có
             $ticketCode = $reservation->ticket_code;
             if (!$ticketCode) {
                 do {
@@ -56,7 +61,12 @@ class PaymentController extends Controller
             ]);
 
             DB::commit();
-            return back()->with('success', 'Đã duyệt đơn hàng ' . $reservation->booking_code . ' thành công!');
+
+            // Gửi mail sau khi commit (lấy user từ reservation, không phải Auth admin)
+            $reservation->load(['user', 'show.movie', 'show.cinema', 'show.room', 'seats', 'combos']);
+            $this->sendConfirmationEmail($reservation, $ticketCode);
+
+            return back()->with('success', 'Đã duyệt đơn ' . $reservation->booking_code . ' và gửi email cho khách!');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Lỗi: ' . $e->getMessage());
@@ -68,15 +78,13 @@ class PaymentController extends Controller
      */
     public function cancel(Reservation $reservation)
     {
-        if (!in_array($reservation->status, ['pending', 'confirmed', 'paid'])) {
+        if (!in_array($reservation->status, ['pending', 'paid'])) {
             return back()->with('error', 'Không thể hủy đơn hàng ở trạng thái này!');
         }
 
         DB::beginTransaction();
         try {
             $reservation->update(['status' => 'cancelled']);
-
-            // Xóa tracking mã giảm giá nếu có
             PromoUserUsage::where('booking_code', $reservation->booking_code)->delete();
 
             DB::commit();
@@ -84,6 +92,60 @@ class PaymentController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Lỗi: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Gửi email xác nhận cho KHÁCH (không phải admin)
+     */
+    private function sendConfirmationEmail(Reservation $reservation, string $ticketCode): void
+    {
+        try {
+            $user = $reservation->user;
+
+            if (!$user?->email) {
+                Log::warning('Admin confirm: no email for user', ['booking_code' => $reservation->booking_code]);
+                return;
+            }
+
+            $bookingCode = $reservation->booking_code;
+
+            $seats = ReservationSeat::where('booking_code', $bookingCode)
+                ->join('seats', 'reservation_seats.seat_id', '=', 'seats.seat_id')
+                ->pluck('seats.seat_num')
+                ->toArray();
+
+            $combos = ReservationCombo::where('booking_code', $bookingCode)
+                ->join('combos', 'reservation_combos.combo_id', '=', 'combos.combo_id')
+                ->get(['combos.combo_name', 'reservation_combos.quantity', 'reservation_combos.combo_price']);
+
+            $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=' . urlencode($ticketCode);
+
+            Mail::send('emails.booking-confirmation', [
+                'user'        => $user,
+                'reservation' => $reservation,
+                'seats'       => $seats,
+                'combos'      => $combos,
+                'bookingCode' => $bookingCode,
+                'ticketCode'  => $ticketCode,
+                'qrCodeUrl'   => $qrCodeUrl,
+                'detailLink'  => route('booking.detail', $bookingCode),
+                'isFree'      => ($reservation->total_amount == 0),
+            ], function ($m) use ($user) {
+                $m->to($user->email)->subject('Xác nhận đặt vé thành công - GhienCine');
+            });
+
+            Log::info('Admin confirm: email sent', [
+                'email'        => $user->email,
+                'booking_code' => $bookingCode,
+                'ticket_code'  => $ticketCode,
+            ]);
+
+        } catch (\Exception $e) {
+            // Mail lỗi không rollback DB, chỉ log
+            Log::error('Admin confirm: email failed - ' . $e->getMessage(), [
+                'booking_code' => $reservation->booking_code,
+            ]);
         }
     }
 }
